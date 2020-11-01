@@ -6,7 +6,7 @@ use App\Providers\RouteServiceProvider;
 use Closure;
 use Illuminate\Support\Facades\Auth;
 
-class RedirectIfAuthenticated
+class RedirectIfAuthenticatedAdmin
 {
 
     /**
@@ -20,8 +20,8 @@ class RedirectIfAuthenticated
     public function handle($request, Closure $next, $guard = null)
     {
      
-        if(Auth::guard('web')->check()){
-            return redirect(RouteServiceProvider::HOME);            
+        if(Auth::guard('admin')->check()){
+            return redirect(RouteServiceProvider::ADMIN);            
         } 
         
         return $next($request);
