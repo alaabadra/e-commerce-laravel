@@ -19,7 +19,7 @@ class LoginController extends Controller
         if(auth()->guard('web')->attempt(['email'=>$req->input('email'),'password'=>$req->input('password')])){
             return redirect()->route('user.home');
         }
-         return redirect()->back()->with(['errors'=>'هناك خطا بالبيانات']);
+            return redirect()->back()->with(['errors'=>'هناك خطا بالبيانات']);
 
     }
 
