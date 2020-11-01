@@ -29,12 +29,14 @@ class LoginController extends Controller
     public function regPost(Request $req){
         $data=$req->all();
         $userCount=User::where('email',$data['email'])->count();
+       // dd($userCount);
         if($userCount>0){
-            return redirect('/user/login')->with('flash_message_error','email is exist already , so you can make  login direct');
+            return redirect('/user/login');
         }else{
           if($data['password_confirmation']==$data['password']){
             User::insert(['name'=>$data['name'],'email'=>$data['email'],'password'=>bcrypt($data['password'])]);
-            return  redirect('/user');    
+         
+            return  redirect('/user/login');    
           }else{
             return  redirect('/user/reg');    
           }
