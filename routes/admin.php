@@ -8,8 +8,8 @@ Route::group(['middleware'=>'auth:admin'],function(){
 
 
 Route::group(['middleware'=>'re_admin','namespace'=>'Admin'],function(){
-    Route::get('login','AdminLoginController@login')->name('admin.login');
-    Route::post('login','AdminLoginController@loginPost');
+    Route::get('login','LoginController@login')->name('admin.login');
+    Route::post('login','LoginController@loginPost');
 });
 
-Route::get('/logout', 'AdminLoginController@logout')->name('admin.logout');
+Route::get('/logout', 'Admin\LoginController@logout')->name('admin.logout');
