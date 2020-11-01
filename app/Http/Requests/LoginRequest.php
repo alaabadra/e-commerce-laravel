@@ -31,9 +31,9 @@ class LoginRequest extends FormRequest
     public function messages()
     {
         return [
-            'email.required'=>'الايميل مطلوب',
-            'email.email'=>'الايميل يجب ان يكون صالح',
-            'password.required'=>'كلمة المرور مطلوب',
+            'email.required'=>'email is required',
+            'email.email'=>'email must be valid',
+            'password.required'=>'password is required',
         ];
     }
 }
