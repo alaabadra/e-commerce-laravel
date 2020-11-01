@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Http\Requests\LoginRequest;
+use App\Http\Requests\RegRequest;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,7 +27,7 @@ class LoginController extends Controller
         return view('auth.register');
     }
 
-    public function regPost(Request $req){
+    public function regPost(RegRequest $req){
         $data=$req->all();
         $userCount=User::where('email',$data['email'])->count();
        // dd($userCount);
