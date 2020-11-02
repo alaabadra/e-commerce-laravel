@@ -9,7 +9,5 @@ class Category extends Model
     public function products(){
         return $this->hasMany("App\Product");
     }
-    public function vendors(){
-        return $this->hasMany("App\Vendor");
-    }
+
 }
