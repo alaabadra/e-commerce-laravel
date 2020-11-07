@@ -16,19 +16,14 @@ class CreateOrdersTable extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->string('order_payment_method');
-            $table->tinyInteger('order_is_method');
-            $table->integer('order_number');
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onUpdate('CASCADE')->onDelete('CASCADE');
+            
             $table->unsignedBigInteger('delivery_id');
             $table->foreign('delivery_id')->references('id')->on('deliveries')->onUpdate('CASCADE')->onDelete('CASCADE');
-            $table->integer('order_price');
-            $table->string('order_currency_price');
+            $table->integer('grand_total');
+            $table->integer('coupon_amount');
             $table->tinyInteger('order_status');
-            $table->string('order_shipping_tax');
-            $table->integer('order_shipping_cost');
-            $table->string('order_currency_shipping_cost');
-
             $table->timestamps();
         });
     }

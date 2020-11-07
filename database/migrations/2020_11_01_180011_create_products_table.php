@@ -17,16 +17,16 @@ class CreateProductsTable extends Migration
             $table->id();
             $table->unsignedBigInteger('category_id');
             $table->foreign('category_id')->references('id')->on('categories')->onUpdate('CASCADE')->onDelete('CASCADE');
-            $table->string('product_name')->nullable();
-            $table->string('product_language');
+            $table->unsignedBigInteger('language_id');
+            $table->foreign('language_id')->references('id')->on('languages')->onUpdate('CASCADE')->onDelete('CASCADE');         
             $table->integer('product_translation_of');
+            $table->string('product_name')->nullable();
             $table->string('product_image')->nullable();
-            $table->integer('product_price');
-            $table->string('product_currency');
             $table->string('product_quantity')->nullable();
-            $table->string('product_url')->nullable();
             $table->string('product_type')->nullable();
             $table->tinyInteger('product_status')->default(0);
+            $table->tinyInteger('product_feature')->default(0);
+            $table->tinyInteger('product_popular')->default(0);
             $table->timestamps();
         });
     }

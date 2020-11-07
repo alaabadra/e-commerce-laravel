@@ -15,18 +15,19 @@ class CreateProductAttributesTable extends Migration
     {
         Schema::create('product_attributes', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('cart_id');
+            $table->unsignedBigInteger('cart_id')->default(0);
             $table->foreign('cart_id')->references('id')->on('carts')->onUpdate('CASCADE')->onDelete('CASCADE');
-            $table->string('product_attr_name')->nullable();
-            $table->string('product_attr_language');
+            $table->unsignedBigInteger('product_id');
+            $table->foreign('product_id')->references('id')->on('products')->onUpdate('CASCADE')->onDelete('CASCADE');
+            $table->unsignedBigInteger('language_id');
+            $table->foreign('language_id')->references('id')->on('languages')->onUpdate('CASCADE')->onDelete('CASCADE');
             $table->integer('product_attr_translation_of');
             $table->integer('product_attr_price');
-            $table->string('product_attr_currency');
             $table->string('product_attr_image')->nullable();
             $table->string('product_attr_quantity')->nullable();
-            $table->string('product_attr_url')->nullable();
-            $table->string('product_attr_type')->nullable();
             $table->tinyInteger('product_attr_status')->default(0);
+            $table->tinyInteger('product_feature')->default(0);
+            $table->tinyInteger('product_popular')->default(0);
             $table->timestamps();
         });
     }

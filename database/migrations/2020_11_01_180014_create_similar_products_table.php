@@ -15,10 +15,17 @@ class CreateSimilarProductsTable extends Migration
     {
         Schema::create('similar_products', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('order_id');
-            $table->foreign('order_id')->references('id')->on('orders')->onUpdate('CASCADE')->onDelete('CASCADE');
-            $table->unsignedBigInteger('product_attr_id');
-            $table->foreign('product_attr_id')->references('id')->on('product_attributes')->onUpdate('CASCADE')->onDelete('CASCADE');
+            $table->unsignedBigInteger('product_id');
+            $table->foreign('product_id')->references('id')->on('products')->onUpdate('CASCADE')->onDelete('CASCADE');
+            $table->string('product_name')->nullable();
+            $table->unsignedBigInteger('language_id');
+            $table->foreign('language_id')->references('id')->on('languages')->onUpdate('CASCADE')->onDelete('CASCADE');         
+            $table->integer('product_translation_of');
+            $table->string('product_image')->nullable();
+            $table->integer('product_price');
+            $table->string('product_quantity')->nullable();
+            $table->string('product_type')->nullable();
+            $table->tinyInteger('product_status')->default(0);
             $table->timestamps();
         });
     }

@@ -19,6 +19,7 @@ class CreateOrderProductAttributes extends Migration
             $table->foreign('order_id')->references('id')->on('orders')->onUpdate('CASCADE')->onDelete('CASCADE');
             $table->unsignedBigInteger('product_attr_id');
             $table->foreign('product_attr_id')->references('id')->on('product_attributes')->onUpdate('CASCADE')->onDelete('CASCADE');
+            
             $table->timestamps();
         });
 
