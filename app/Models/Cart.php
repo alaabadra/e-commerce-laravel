@@ -7,6 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class Cart extends Model
 {
     public function productAttributes(){
-        return $this->hasMany("App\ProductAttribute");
+        return $this->hasMany("App\Models\ProductAttribute");
     }
 }

@@ -6,10 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Favorite extends Model
 {
-    public function product(){
-        return $this->belongsTo("App\Product");
+    public function productAttribute(){
+        return $this->belongsTo("App\Models\ProductAttribute");
     }
     public function user(){
-        return $this->belongsTo("App\User");
+        return $this->belongsTo("App\Models\User");
     }
 }
