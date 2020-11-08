@@ -10,7 +10,7 @@
             mini == true ? 'col-sm-11 ml-auto row ' : 'col-sm-9 ml-auto row '
           "
         >
-          <!-- tottal income card per month-->
+          <!-- tottal income card per month -->
           <div class="col-sm-3 row p-0 mr-auto">
             <v-btn
               absolute
