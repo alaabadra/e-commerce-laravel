@@ -27,7 +27,32 @@ const routes = [
     // which is lazy-loaded when the route is visited.
     component: () =>
       import(
-        /* webpackChunkName: "about" */ "../views/eng/MainDashboard/AdminDashboard.vue"
+        /* webpackChunkName: "about" */
+        "../views/eng/AdminDashboard.vue"
+      )
+  },
+  {
+    path: "/New-Product",
+    name: "/New-Product",
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () =>
+      import(
+        /* webpackChunkName: "about" */
+        "../views/eng/Products/Addproduct.vue"
+      )
+  },
+  {
+    path: "/Manage-Product",
+    name: "/Manage-Product",
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () =>
+      import(
+        /* webpackChunkName: "about" */
+        "../views/eng/Products/Manageproduct.vue"
       )
   }
 ];

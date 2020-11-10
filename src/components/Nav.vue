@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- navbar -->
-    <v-app-bar dense dark app color="primary">
+    <v-app-bar dense dark app color="primary" class="nav">
       <v-icon
         class="mr-5"
         @click.stop="
@@ -13,19 +13,9 @@
       <v-toolbar-title>STORE</v-toolbar-title>
 
       <v-spacer></v-spacer>
-
-      <!-- settings button and dropdown -->
-      <v-menu rounded="b-xl" offset-y left :close-on-content-click="false">
-        <template v-slot:activator="{ attrs, on }">
-          <v-btn class="white--text" v-bind="attrs" v-on="on" icon large>
-            <v-icon>mdi-magnify</v-icon>
-          </v-btn>
-        </template>
-
-        <v-list width="30em" class="p-2">
-          <v-combobox placeholder="Search What You Want ..."></v-combobox>
-        </v-list>
-      </v-menu>
+      <v-btn icon @click.stop="sDrawer = !sDrawer">
+        <v-icon>mdi-magnify</v-icon>
+      </v-btn>
 
       <v-btn icon>
         <v-badge content="5" value="3" color="green" overlap>
@@ -34,46 +24,44 @@
           </v-icon>
         </v-badge>
       </v-btn>
-      <v-btn icon>
-        <v-badge content="3" value="3" color="green" overlap>
-          <v-icon>
-            mdi-bell
-          </v-icon>
-        </v-badge>
+      <v-btn
+        v-show="windowWidth > 700 ? false : true"
+        icon
+        @click="settingsDrawer = !settingsDrawer"
+      >
+        <v-icon>mdi-cog</v-icon>
       </v-btn>
-
-      <!-- settings button and dropdown -->
-      <v-menu rounded="b-xl" offset-y>
-        <template v-slot:activator="{ attrs, on }">
-          <v-btn class="white--text" v-bind="attrs" v-on="on" icon large>
-            <v-icon>mdi-cog</v-icon>
-          </v-btn>
-        </template>
-
-        <v-list dense width="150px">
-          <div
-            class="text-center grey--text"
-            width="150px"
-            style="font-size:.8rem"
-          >
-            Settings
-          </div>
-          <v-list-item-group color="primary">
-            <v-list-item v-for="item in settingsItems" :key="item.title">
-              <v-list-item-icon>
-                <v-icon v-text="item.icon"></v-icon>
-              </v-list-item-icon>
-              <v-list-item-content>
-                <v-list-item-title v-text="item.title"></v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-          </v-list-item-group>
-        </v-list>
-      </v-menu>
     </v-app-bar>
     <!--end of navbar -->
 
-    <!--permenant drawer -->
+    <!-- search drawers -->
+    <v-navigation-drawer
+      v-model="sDrawer"
+      app
+      right
+      temporary
+      hide-overlay
+      height="60px"
+      style="overflow: hidden !important;"
+      dark
+      class="w-100"
+    >
+      <v-list nav dense>
+        <v-list-item>
+          <v-combobox
+            outlined
+            dense
+            rounded
+            placeholder="Search What You Want.."
+            prepend-inner-icon="mdi-magnify"
+          ></v-combobox>
+        </v-list-item>
+      </v-list>
+    </v-navigation-drawer>
+
+    <!-- end of search drawers -->
+
+    <!--navigation drawer -->
 
     <v-navigation-drawer
       v-model="drawer"
@@ -90,12 +78,14 @@
         <v-list-item-title>John Leider</v-list-item-title>
       </v-list-item>
       <v-divider></v-divider>
+
       <div v-for="item in DrawerItems" :key="item.title">
         <v-list-group
           :value="false"
           :prepend-icon="item.icon"
           color="white"
           v-if="item.subItems"
+          no-action
         >
           <template v-slot:activator>
             <v-list-item-title>{{ item.title }}</v-list-item-title>
@@ -104,6 +94,7 @@
             <v-list-item
               v-for="subItem in item.subItems"
               :key="subItem.title"
+              :to="subItem.href"
               link
             >
               <v-list-item-icon>
@@ -113,8 +104,8 @@
             </v-list-item>
           </v-list>
         </v-list-group>
-        <v-list v-else-if="!item.subItems">
-          <v-list-item link>
+        <v-list v-else-if="!item.subItems" no-action>
+          <v-list-item link :to="item.href">
             <v-list-item-icon>
               <v-icon v-text="item.icon"></v-icon>
             </v-list-item-icon>
@@ -123,7 +114,57 @@
         </v-list>
       </div>
     </v-navigation-drawer>
-    <!-- end of permanent drawer -->
+    <!-- end of navigation drawer -->
+
+    <!-- button to trigger settings drawer -->
+
+    <v-btn
+      @click.stop="settingsDrawer = !settingsDrawer"
+      color="primary"
+      fab
+      dark
+      small
+      right
+      tile
+      style="top:300px !important; left: 95%; margin-left: 10px; position : fixed;
+      z-index: 2"
+      v-show="windowWidth > 700 ? true : false"
+    >
+      <v-icon>mdi-cog</v-icon>
+    </v-btn>
+
+    <!-- settings drawer -->
+    <v-navigation-drawer
+      v-model="settingsDrawer"
+      temporary
+      right
+      app
+      hide-overlay
+    >
+      <v-list-item class="px-2">
+        <v-list-item-icon>
+          <v-icon>mdi-cog</v-icon>
+        </v-list-item-icon>
+
+        <v-list-item-content>
+          <v-list-item-title>Settings</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+
+      <v-divider></v-divider>
+
+      <v-list dense>
+        <v-list-item v-for="item in settingsItems" :key="item.title" link>
+          <v-list-item-icon>
+            <v-icon>{{ item.icon }}</v-icon>
+          </v-list-item-icon>
+
+          <v-list-item-content>
+            <v-list-item-title>{{ item.title }}</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+    </v-navigation-drawer>
   </div>
 </template>
 <script>
@@ -134,6 +175,8 @@ export default {
     return {
       drawer: false,
       mini: true,
+      sDrawer: false,
+      settingsDrawer: false,
       //items in the settings dropdown
       settingsItems: [
         { title: "Search", icon: "mdi-magnify" },
@@ -151,11 +194,18 @@ export default {
       DrawerItems: [
         {
           title: "Dashboard",
-          icon: "mdi-view-dashboard"
+          icon: "mdi-view-dashboard",
+          href: "/Admin-Dashboard"
         },
         {
           title: "Users",
-          icon: "mdi-account-circle"
+          icon: "mdi-account-circle",
+          href: ""
+        },
+        {
+          title: "Categories",
+          icon: "mdi-clipboard-text",
+          href: ""
         },
         {
           title: "Products",
@@ -163,11 +213,13 @@ export default {
           subItems: [
             {
               title: "New Product",
-              icon: "mdi-plus-circle"
+              icon: "mdi-plus-circle",
+              href: "/New-Product"
             },
             {
               title: "Manage Products",
-              icon: "mdi-table-edit"
+              icon: "mdi-table-edit",
+              href: "/Manage-Product"
             }
           ]
         },
@@ -177,11 +229,13 @@ export default {
           subItems: [
             {
               title: "Orders",
-              icon: "mdi-cart"
+              icon: "mdi-cart",
+              href: ""
             },
             {
               title: "Shipings",
-              icon: "mdi-truck"
+              icon: "mdi-truck",
+              href: ""
             }
           ]
         },
@@ -191,26 +245,31 @@ export default {
           subItems: [
             {
               title: "New Campaign",
-              icon: "mdi-bookmark-plus"
+              icon: "mdi-bookmark-plus",
+              href: ""
             },
             {
               title: "Analystics",
-              icon: "mdi-chart-areaspline"
+              icon: "mdi-chart-areaspline",
+              href: ""
             }
           ]
         }
       ]
     };
   },
-  created() {
-    //:permanent="windowWidth > 700 ? true : mini == false ? false : true"
-    //  :mini-variant="windowWidth > 700 ? mini : !mini"
-    this.emitMini();
-  },
+  created() {},
   methods: {
     emitMini() {
-      this.$emit("emitMini", this.mini);
+      this.$emit("emitMini", { mini: this.mini, setMini: this.settingsDrawer });
     }
   }
 };
 </script>
+<style scoped>
+body {
+}
+a:hover {
+  text-decoration: none !important;
+}
+</style>

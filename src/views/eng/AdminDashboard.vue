@@ -1,6 +1,6 @@
 <template>
   <!-- main dashboard elements -->
-  <div>
+  <div class="mt-5">
     <div class="container-fluid" style="margin-top: 60px">
       <div class="row mr-1">
         <Nav @emitMini="emitValue($event)" />
@@ -10,8 +10,14 @@
             mini == true ? 'col-sm-11 ml-auto row ' : 'col-sm-9 ml-auto row '
           "
         >
-          <!-- tottal income card per month-->
-          <div class="col-sm-3 row p-0 mr-auto mt-3">
+          <!-- tottal income card per month -->
+          <div
+            :class="
+              windowWidth > 700
+                ? 'col-sm-3 row p-0 mr-auto mt-3'
+                : 'col-sm-3 row p-0 mx-auto mt-3'
+            "
+          >
             <v-btn
               absolute
               class="ml-3"
@@ -21,17 +27,17 @@
             >
               <v-icon large>mdi-cash</v-icon>
             </v-btn>
-            <v-card class="col-sm-12 mx-auto mt-5 row">
-              <div class="col-sm-9 ml-auto row">
+            <v-card class="col-sm-12 mx-auto row mt-5">
+              <div class="col-sm-9 ml-auto row ">
                 <v-card-subtitle
-                  class="p-1 ml-auto col-sm-8"
+                  class="p-1 ml-auto col-sm-12 text-right"
                   style="font-size: .8rem !important"
-                  >Revenue</v-card-subtitle
+                  >revenue</v-card-subtitle
                 >
                 <v-card-title
-                  class="p-0 ml-auto col-sm-8"
-                  style="font-size: 1rem !important"
-                  >55000</v-card-title
+                  class="p-0 ml-auto text-right mt-1"
+                  style="font-size: 1rem !important;"
+                  >90000</v-card-title
                 >
               </div>
               <div
@@ -43,7 +49,7 @@
                 style="font-size: .8rem !important"
               >
                 <v-icon small color="red"> mdi-alert </v-icon> Per
-                Month</v-card-subtitle
+                Day</v-card-subtitle
               >
             </v-card>
           </div>
@@ -65,12 +71,12 @@
             <v-card class="col-sm-12 mx-auto mt-5 row">
               <div class="col-sm-9 ml-auto row">
                 <v-card-subtitle
-                  class="p-1 ml-auto col-sm-8"
+                  class="p-1 ml-auto col-sm-12 text-right"
                   style="font-size: .8rem !important"
                   >Orders</v-card-subtitle
                 >
                 <v-card-title
-                  class="p-0 ml-auto col-sm-8"
+                  class="p-0 ml-auto"
                   style="font-size: 1rem !important"
                   >20</v-card-title
                 >
@@ -105,12 +111,12 @@
             <v-card class="col-sm-12 mx-auto mt-5 row">
               <div class="col-sm-9 ml-auto row">
                 <v-card-subtitle
-                  class="p-1 ml-auto col-sm-8"
+                  class="p-1 ml-auto col-sm-12  text-right"
                   style="font-size: .8rem !important"
                   >Shipings</v-card-subtitle
                 >
                 <v-card-title
-                  class="p-0 ml-auto col-sm-8"
+                  class="p-0 ml-auto"
                   style="font-size: 1rem !important"
                   >130</v-card-title
                 >
@@ -131,7 +137,13 @@
           <!-- end of Daily orders -->
 
           <!-- end of cards -->
-          <div class="col-sm-3 row p-0 ml-auto mt-3">
+          <div
+            :class="
+              windowWidth > 700
+                ? 'col-sm-3 row p-0 ml-auto mt-3'
+                : 'col-sm-3 row p-0 mx-auto mt-3'
+            "
+          >
             <v-btn
               absolute
               class="ml-3"
@@ -144,12 +156,12 @@
             <v-card class="col-sm-12 mx-auto mt-5 row">
               <div class="col-sm-9 ml-auto row">
                 <v-card-subtitle
-                  class="p-1 ml-auto col-sm-8"
+                  class="p-1 ml-auto col-sm-12  text-right"
                   style="font-size: .8rem !important"
                   >Visitors</v-card-subtitle
                 >
                 <v-card-title
-                  class="p-0 ml-auto col-sm-8 text-right"
+                  class="p-0 ml-auto text-right"
                   style="font-size: 1rem !important"
                   >35000</v-card-title
                 >
@@ -176,7 +188,14 @@
                 Sales Last 24h
               </div>
             </v-card-text>
-            <LineChart style="z-index: 2; height: 350px" class="col-sm-12" />
+            <LineChart
+              :style="
+                windowWidth > 700
+                  ? 'z-index: 2; height: 350px'
+                  : 'z-index: 2; height: 200px'
+              "
+              class="col-sm-12"
+            />
 
             <v-divider></v-divider>
 
@@ -186,27 +205,28 @@
               </v-btn>
             </v-card-actions>
           </v-card>
-          <Map class="col-sm-12" />
+          <Extra />
         </div>
       </div>
     </div>
   </div>
 </template>
 <script>
-import Nav from "../../../components/Nav";
-import LineChart from "../../../components/LineChart.vue";
-import Map from "../../../components/Map";
+import Nav from "../../components/Nav";
+import LineChart from "../../components/LineChart.vue";
+import Extra from "../../components/ExtraInfo";
 export default {
   name: "home",
   components: {
     Nav,
     LineChart,
-    Map
+    Extra
   },
   data() {
     return {
       drawer: false,
       mini: null,
+      settingsDrawer: null,
       items: [
         { title: "Search", icon: "mdi-magnify" },
         { title: "Home", icon: "mdi-view-dashboard" },
@@ -223,7 +243,7 @@ export default {
   created() {},
   methods: {
     emitValue(value) {
-      this.mini = value;
+      this.mini = value.mini;
     }
   }
 };
