@@ -6,7 +6,7 @@
         <div
           :class="
             mini == true
-              ? 'col-sm-11 ml-auto row mt-5 mr-1'
+              ? 'col-sm-11 mx-auto row mt-5 mr-1'
               : 'col-sm-9 ml-auto row mt-5 mr-1'
           "
         >
@@ -14,7 +14,8 @@
             class="col-sm-12 mx-auto white--text font-2 text-center"
             color="black"
           >
-            <i class="fas fa-shopping-bag ml-3"></i> Products Management
+            <v-icon dark large>mdi-package-variant-closed</v-icon> Products
+            Management
           </v-alert>
           <v-data-table
             :headers="headers"
@@ -36,9 +37,16 @@
                   v-model="search"
                   append-icon="mdi-magnify"
                   label="Search"
-                  class="col-sm-5 mr-auto"
-                  single-line
-                  hide-details
+                  class="col-sm-5 mr-auto mt-5"
+                  rounded
+                  dense
+                  solo
+                  clearable
+                  @click:append="
+                    () => {
+                      alert('hello');
+                    }
+                  "
                 ></v-text-field>
                 <v-dialog v-model="dialog">
                   <template v-slot:activator="{ on, attrs }">
@@ -63,11 +71,11 @@
               </v-toolbar>
             </template>
             <template v-slot:item.actions="{ item }">
-              <v-btn icon small class="mr-4" :to="`/editproduct/${item.id}`">
-                <v-icon>mdi-pencil-square</v-icon>
+              <v-btn icon small class="mr-4" :to="`/Edit-Product/${item.id}`">
+                <v-icon small>mdi-pencil-box</v-icon>
               </v-btn>
               <v-btn icon small @click="deleteItem(item)">
-                <v-icon>mdi-delete</v-icon>
+                <v-icon small>mdi-delete</v-icon>
               </v-btn>
             </template>
             <template v-slot:no-data>
@@ -97,7 +105,7 @@ export default {
   },
   data() {
     return {
-      mini: null,
+      mini: true,
       expanded: [],
       singleExpand: false,
       search: "",
@@ -112,7 +120,6 @@ export default {
         },
         { text: "Category", value: "category" },
         { text: "Code", value: "code" },
-        { text: "Main Qty", value: "mainQuantity" },
         { text: "Selling Price", value: "mainSellingPrice" },
         { text: "Status", value: "status" },
         { text: "Actions", value: "actions", sortable: false }
@@ -122,14 +129,12 @@ export default {
       editedItem: {
         name: null,
         code: null,
-        mainQuantity: null,
         mainSellingPrice: null,
         status: null
       },
       defaultItem: {
         name: null,
         code: null,
-        mainQuantity: null,
         mainSellingPrice: null,
         status: null
       }
@@ -155,14 +160,24 @@ export default {
   methods: {
     //method to get the mini property
     emitValue(value) {
-      this.mini = value.mini;
+      this.mini = value;
     },
     getColor(status) {
       if (status == "منتهية" || status == "Not Available") return "red";
       else if (status == "متواجدة" || status == "Available") return "green";
       else if (status == "تحت الطلب" || status == "On Demand") return "amber";
     },
-    initialize() {},
+    initialize() {
+      this.products = [
+        {
+          name: "lolo",
+          code: "514515",
+          mainQuantity: "1",
+          mainSellingPrice: "priceless",
+          status: "available"
+        }
+      ];
+    },
 
     editItem(item) {
       this.editedIndex = this.products.indexOf(item);
@@ -170,9 +185,11 @@ export default {
       this.dialog = true;
     },
 
-    // deleteItem(item) {
-    //   // const index = this.products.indexOf(item);
-    // },
+    deleteItem(item) {
+      const index = this.products.indexOf(item);
+      confirm("Are You Sure To Delete This Item ?") &&
+        this.products.splice(index, 1);
+    },
 
     close() {
       this.dialog = false;

@@ -7,7 +7,7 @@
         <!-- cards -->
         <div
           :class="
-            mini == true ? 'col-sm-11 ml-auto row ' : 'col-sm-9 ml-auto row '
+            mini == true ? 'col-sm-11 ml-auto row' : 'col-sm-9 ml-auto row'
           "
         >
           <!-- tottal income card per month -->
@@ -225,7 +225,7 @@ export default {
   data() {
     return {
       drawer: false,
-      mini: null,
+      mini: true,
       settingsDrawer: null,
       items: [
         { title: "Search", icon: "mdi-magnify" },
@@ -243,7 +243,7 @@ export default {
   created() {},
   methods: {
     emitValue(value) {
-      this.mini = value.mini;
+      this.mini = value;
     }
   }
 };

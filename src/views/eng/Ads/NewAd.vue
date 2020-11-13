@@ -18,132 +18,55 @@
             class="col-sm-12 mx-auto white--text font-2 text-center"
             color="black"
           >
-            <v-icon dark large>mdi-package-variant-closed</v-icon> Products
-            Management
+            <v-icon dark large>mdi-book-variant</v-icon> Products Management
           </v-alert>
+          <v-combobox
+            dense
+            solo
+            rounded
+            color="black"
+            label="Ad Type"
+            :items="adTypes"
+            class="col-sm-5 mr-auto"
+          ></v-combobox>
+          <v-text-field
+            dense
+            solo
+            rounded
+            color="black"
+            label="number of pictuers"
+            class="col-sm-5 ml-auto"
+          ></v-text-field>
           <v-btn
             color="primary"
-            class="col-sm-5 mr-auto text-center uploadedImg p-0"
-            style="height:13rem;"
+            class="col-sm-12 mr-auto text-center uploadedImg p-0"
+            style="height:25rem;"
             dark
             @click="openFile()"
           >
             <v-icon x-large>mdi-file-image</v-icon>
           </v-btn>
           <input type="file" hidden ref="imgUpload" />
-          <div class="col-sm-5"></div>
-          <v-text-field
-            class="col-sm-5 mr-auto mt-2"
-            outlined
-            dense
-            label="Product Name"
-            v-model="name"
-          ></v-text-field>
-          <v-text-field
-            class="col-sm-5 ml-auto mt-2"
-            outlined
-            dense
-            label="Code"
-            v-model="code"
-          ></v-text-field>
-          <v-text-field
-            class="col-sm-5 mr-auto mt-2"
-            outlined
-            dense
-            label="Wholesale price"
-            v-model="wholesalePrice"
-          ></v-text-field>
-          <v-text-field
-            class="col-sm-5 ml-auto mt-2"
-            outlined
-            dense
-            label="Main Selling Price"
-            v-model="mainSellingPrice"
-          ></v-text-field>
-          <v-text-field
-            class="col-sm-5 mr-auto mt-2"
-            outlined
-            dense
-            label="Sub-Sale Price"
-            v-model="secSellingPrice"
-          ></v-text-field>
-          <v-text-field
-            append-icon="mdi-weight-kilogram"
-            name="input-10-2"
-            v-model="mainQuantity"
-            class="col-sm-5 ml-auto qty mt-2"
-            outlined
-            dense
-            :label="label"
-            @click="changeLabel(label)"
-          ></v-text-field>
-          <v-text-field
-            append-icon="mdi-weight-kilogram"
-            name="input-10-2"
-            v-model="secQuantity"
-            class="col-sm-5 mr-auto qty mt-2"
-            outlined
-            dense
-            label="Sub-Storage Qty (Piece)"
-            @input="getWItem()"
-          ></v-text-field>
-          <v-text-field
-            append-icon="mdi-weight-kilogram"
-            name="input-10-2"
-            v-model="itemWeight"
-            class="col-sm-5 ml-auto qty mt-2"
-            outlined
-            dense
-            label="Item Weight"
-          ></v-text-field>
-          <v-combobox
-            class="col-sm-5 mr-auto mt-2"
-            outlined
-            dense
-            label="Brand"
-            :items="brands"
-            v-model="brand"
-          ></v-combobox>
-          <v-combobox
-            class="col-sm-5 ml-auto mt-2"
-            outlined
-            dense
-            label="Category"
-            :items="categories"
-            v-model="category"
-          ></v-combobox>
-          <v-combobox
-            class="col-sm-5 mr-auto mt-2"
-            outlined
-            dense
-            label="Store"
-            :items="stores"
-            v-model="store"
-          ></v-combobox>
-          <v-combobox
-            class="col-sm-5 ml-auto mt-2"
-            outlined
-            dense
-            label="Group"
-            :items="groups"
-            v-model="group"
-          ></v-combobox>
-          <v-combobox
-            class="col-sm-5 mr-auto mt-2"
-            outlined
-            dense
-            label="Status"
-            :items="status"
-            v-model="state"
-          ></v-combobox>
-          <v-combobox
-            class="col-sm-5 ml-auto mt-2"
-            outlined
-            dense
-            label="(Corp & Importer)"
-            :items="companies"
-            v-model="company"
-          ></v-combobox>
+
+          <!-- multiple videos -->
+          <v-carousel v-model="model">
+            <v-carousel-item v-for="color in colors" :key="color">
+              <v-sheet :color="color" height="100%" tile>
+                <v-row class="fill-height" align="center" justify="center">
+                  <v-btn
+                    color="primary"
+                    class="col-sm-12 mr-auto text-center uploadedImg p-0"
+                    style="height:25rem;"
+                    dark
+                    @click="openFile()"
+                  >
+                    <v-icon x-large>mdi-file-image</v-icon>
+                  </v-btn>
+                </v-row>
+              </v-sheet>
+            </v-carousel-item>
+          </v-carousel>
+
           <label class="col-sm-12 font-2 text-left">Description</label>
           <VueEditor
             class="col-sm-12 p-0"
@@ -207,17 +130,7 @@ export default {
       picture: null,
       name: null,
       code: Math.floor(Math.random() * 1000000000),
-      wholesalePrice: 0,
-      mainSellingPrice: 0,
-      secSellingPrice: 0,
-      mainQuantity: null,
-      secQuantity: null,
-      itemWeight: null,
       brand: null,
-      category: null,
-      store: null,
-      group: null,
-      state: null,
       desc: null,
       company: null,
       brands: [],
@@ -228,7 +141,10 @@ export default {
       status: ["On Demand", "Not Available", "Available"],
       label: "Main Storage Qty",
       labels: ["Qty (Piece)", "Qty (g)", "Qty (Kg)"],
-      i: 0
+      i: 0,
+      model: 0,
+      colors: ["primary", "secondary", "yellow darken-2", "red", "orange"],
+      adTypes: ["Single Picture", "Multiple Pictuers", "Video"]
     };
   },
   mounted() {

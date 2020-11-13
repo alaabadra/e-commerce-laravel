@@ -4,15 +4,21 @@
     <v-overlay :value="overlay">
       <v-progress-circular indeterminate size="64"></v-progress-circular>
     </v-overlay>
-    <navigate />
-    <div class="container">
+    <navigate @emitMini="emitValue($event)" />
+    <div class="container mt-5">
       <div class="row">
-        <div class="col-sm-9 mx-auto row mt-5">
+        <div
+          :class="
+            mini == true
+              ? 'col-sm-9 mx-auto row mt-5'
+              : 'col-sm-9 ml-auto row mt-5'
+          "
+        >
           <v-alert
             class="col-sm-12 mx-auto white--text font-2 text-center"
             color="black"
           >
-            <i class="fas fa-shopping-bag mr-3"></i> Products Management
+            <v-icon dark large>mdi-package-variant-closed</v-icon> Edit Product
           </v-alert>
           <v-btn
             color="primary"
@@ -21,10 +27,7 @@
             dark
             @click="openFile()"
           >
-            <i
-              class="fas fa-file-image white--text"
-              style="font-size: 7rem;"
-            ></i>
+            <v-icon dark x-large>mdi-file-image</v-icon>
           </v-btn>
           <input type="file" hidden class="imgUpload" />
           <div class="col-sm-5"></div>
@@ -197,6 +200,7 @@ export default {
   },
   data() {
     return {
+      mini: true,
       overlay: false,
       product: {},
       brands: [],
@@ -212,6 +216,10 @@ export default {
   },
   mounted() {},
   methods: {
+    //getting the mini property
+    emitValue(value) {
+      this.mini = value;
+    },
     //getting the weight for an item
     getWItem() {
       this.product.itemWeight = parseFloat(

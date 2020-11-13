@@ -49,11 +49,12 @@
       <v-list nav dense>
         <v-list-item>
           <v-combobox
-            outlined
             dense
             rounded
             placeholder="Search What You Want.."
             prepend-inner-icon="mdi-magnify"
+            solo
+            filled
           ></v-combobox>
         </v-list-item>
       </v-list>
@@ -86,9 +87,13 @@
           color="white"
           v-if="item.subItems"
           no-action
+          dense
         >
           <template v-slot:activator>
-            <v-list-item-title>{{ item.title }}</v-list-item-title>
+            <v-list-item-title
+              style="font-size: .8rem !important; font-weight:500 !important"
+              >{{ item.title }}</v-list-item-title
+            >
           </template>
           <v-list dense>
             <v-list-item
@@ -104,7 +109,8 @@
             </v-list-item>
           </v-list>
         </v-list-group>
-        <v-list v-else-if="!item.subItems" no-action>
+        <!-- list items with single item -->
+        <v-list v-else-if="!item.subItems" no-action dense>
           <v-list-item link :to="item.href">
             <v-list-item-icon>
               <v-icon v-text="item.icon"></v-icon>
@@ -126,8 +132,7 @@
       small
       right
       tile
-      style="top:300px !important; left: 95%; margin-left: 10px; position : fixed;
-      z-index: 2"
+      class="settingsBtn"
       v-show="windowWidth > 700 ? true : false"
     >
       <v-icon>mdi-cog</v-icon>
@@ -200,12 +205,12 @@ export default {
         {
           title: "Users",
           icon: "mdi-account-circle",
-          href: ""
+          href: "/Manage-Users"
         },
         {
           title: "Categories",
           icon: "mdi-clipboard-text",
-          href: ""
+          href: "/Manage-Categories"
         },
         {
           title: "Products",
@@ -224,18 +229,23 @@ export default {
           ]
         },
         {
+          title: "Contractors",
+          icon: "mdi-handshake",
+          href: "/Manage-Contractors"
+        },
+        {
           title: "Sales",
           icon: "mdi-currency-usd-circle",
           subItems: [
             {
               title: "Orders",
               icon: "mdi-cart",
-              href: ""
+              href: "/Orders"
             },
             {
               title: "Shipings",
               icon: "mdi-truck",
-              href: ""
+              href: "/Shipings"
             }
           ]
         },
@@ -246,7 +256,7 @@ export default {
             {
               title: "New Campaign",
               icon: "mdi-bookmark-plus",
-              href: ""
+              href: "/New-Ad"
             },
             {
               title: "Analystics",
@@ -255,21 +265,39 @@ export default {
             }
           ]
         }
+        // {
+        //   title: "Reports",
+        //   icon: "mdi-clipboard-text",
+        //   href: "",
+        // },
       ]
     };
   },
   created() {},
   methods: {
     emitMini() {
-      this.$emit("emitMini", { mini: this.mini, setMini: this.settingsDrawer });
+      this.$emit("emitMini", this.mini);
     }
   }
 };
 </script>
-<style scoped>
-body {
-}
+<style>
 a:hover {
   text-decoration: none !important;
+}
+
+@media (min-width: 1000px) {
+  .settingsBtn {
+    top: 300px !important;
+    left: 97% !important;
+    position: fixed !important;
+    z-index: 2;
+  }
+}
+.settingsBtn {
+  top: 300px !important;
+  left: 96% !important;
+  position: fixed !important;
+  z-index: 2;
 }
 </style>
