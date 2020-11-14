@@ -34,7 +34,6 @@ Route::group(['middleware'=>'auth:admin','namespace'=>'Admin'],function(){
         Route::get('/all-categories', 'CategoriesController@allCategories')->name('admin.allCategories.get_all_categories');
         Route::get('/main-categories', 'CategoriesController@mainCategories')->name('admin.mainCategories.get_main_categories');
         Route::get('/main-all-categories', 'CategoriesController@getAllMainCategories')->name('admin.mainCategories.get_all_main_categories');
-        Route::get('/sub-categories', 'CategoriesController@subCategories')->name('admin.subCategories.view');
         Route::get('/get-for-create-main-category', 'CategoriesController@getForCreateMainCategories')->name('admin.get_for_create_main_category.view');
         Route::get('/get-for-create-sub-category', 'CategoriesController@getForCreateSubCategories')->name('admin.get_for_create_sub_category.view');
         Route::get('/show/{categoryId}', 'CategoriesController@show')->name('admin.categorie.show');
@@ -45,10 +44,10 @@ Route::group(['middleware'=>'auth:admin','namespace'=>'Admin'],function(){
         Route::post('/store-default-sub-category', 'CategoriesController@storeSubCategoryForDefaultLang')->name('admin.categorie.store_default_sub_category');
         Route::post('/store-any-sub-category', 'CategoriesController@storeSubCategoryForAnyLang')->name('admin.categorie.store_any_sub_category');
         //update
-        Route::post('/updateMainCategoryForDefaultLang/{categoryId}', 'CategoriesController@updateMainCategoryForDefaultLang')->name('admin.categorie.update_main_category_for_default_lang');
-        Route::post('/updateMainCategoryForAnyLang/{categoryId}', 'CategoriesController@updateMainCategoryForAnyLang')->name('admin.categorie.update_main_category_for_any_lang');
-        Route::post('/updateSubCategoryForDefaultLang/{categoryId}', 'CategoriesController@updateSubCategoryForDefaultLang')->name('admin.categorie.update_sub_category_for_default_lang');
-        Route::post('/updateSubCategoryForAnyLang/{categoryId}', 'CategoriesController@updateSubCategoryForAnyLang')->name('admin.categorie.update_sub_category_for_any_lang');
+        Route::post('/update-main-category-for-default-Lang/{categoryId}', 'CategoriesController@updateMainCategoryForDefaultLang')->name('admin.categorie.update_main_category_for_default_lang');
+        Route::post('/update-main-category-for-any-lang/{categoryId}', 'CategoriesController@updateMainCategoryForAnyLang')->name('admin.categorie.update_main_category_for_any_lang');
+        Route::post('/update-sub-category-for-default-lang/{categoryId}', 'CategoriesController@updateSubCategoryForDefaultLang')->name('admin.categorie.update_sub_category_for_default_lang');
+        Route::post('/update-sub-category-for-any-lang/{categoryId}', 'CategoriesController@updateSubCategoryForAnyLang')->name('admin.categorie.update_sub_category_for_any_lang');
         //delete
         Route::post('/delete/{categoryId}', 'CategoriesController@delete')->name('admin.categorie.delete');
     });
@@ -178,6 +177,17 @@ Route::group(['middleware'=>'auth:admin','namespace'=>'Admin'],function(){
             Route::post('/delete/{userId}', 'BannersController@deleteBanner')->name('admin.banner.delete_banner');
             Route::get('/show/{userId}', 'BannersController@showBanner')->name('admin.banner.show');
         });
+
+                ############################addvertisments######################################
+                Route::group(['prefix'=>'addvertisments','namespace'=>'Admin'],function(){
+                    Route::get('/view', 'AddvertismentsController@viewaddvertisments')->name('admin.addvertisments.view');
+                    Route::post('/store-addvertisment-for-default-lang', 'AddvertismentsController@storeaddvertismentForDefaultLang')->name('admin.addvertisment.store_addvertisment_for_default_lang');
+                    Route::post('/store-addvertisment-for-any-lang', 'AddvertismentsController@storeaddvertismentForAnyLang')->name('admin.addvertisment.store_addvertisment_for_any_lang');
+                    Route::post('/update-addvertisment-for-default-lang', 'AddvertismentsController@updateaddvertismentForDefaultLang')->name('admin.addvertisment.update_addvertisment_for_default_lang');
+                    Route::post('/update-addvertisment-for-any-lang', 'AddvertismentsController@updateaddvertismentForAnyLang')->name('admin.addvertisment.update_addvertisment_for_any_lang');
+                    Route::post('/delete/{userId}', 'AddvertismentsController@deleteaddvertisment')->name('admin.addvertisment.delete_addvertisment');
+                    Route::get('/show/{userId}', 'AddvertismentsController@showaddvertisment')->name('admin.addvertisment.show');
+                });
 
     
 Route::group(['middleware'=>'re_admin','namespace'=>'Admin'],function(){
