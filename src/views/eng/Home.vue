@@ -205,15 +205,12 @@
   </div>
 </template>
 <script>
-import Nav from "../components/Nav";
-import LineChart from "../components/LineChart.vue";
-import Map from "../components/PieChart";
+import Nav from "../../components/Nav";
+
 export default {
   name: "home",
   components: {
-    Nav,
-    LineChart,
-    Map
+    Nav
   },
   data() {
     return {

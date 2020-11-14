@@ -18,7 +18,7 @@
           </v-alert>
           <v-data-table
             :headers="headers"
-            :items="categories"
+            :items="orders"
             :search="search"
             :items-per-page="5"
             item-key="name"
@@ -50,7 +50,7 @@
                   "
                 ></v-text-field>
                 <v-dialog v-model="dialog">
-                  <template v-slot:activator="{ on, attrs }">
+                  <!-- <template v-slot:activator="{ on, attrs }">
                     <v-btn
                       color="primary"
                       dark
@@ -61,7 +61,7 @@
                     >
                       <v-icon large>mdi-plus-circle</v-icon>
                     </v-btn>
-                  </template>
+                  </template> -->
 
                   <v-card class="w-50 mx-auto">
                     <v-card-title>
@@ -69,7 +69,7 @@
                         class="col-sm-12 mx-auto white--text font-2 text-center"
                         color="black"
                       >
-                        <i class="far list-alt mr-3"></i> Categories Management
+                        <i class="far list-alt mr-3"></i> Orders Management
                       </v-alert>
                     </v-card-title>
                     <v-card-text>
@@ -143,6 +143,15 @@
             <template v-slot:no-data>
               <v-btn color="primary" @click="initialize">Reset</v-btn>
             </template>
+            <template v-slot:item.code="{ item }">
+              <v-chip
+                :color="getColor(item.code)"
+                dark
+                link
+                :to="`order/${item.code}`"
+                >{{ item.code }}</v-chip
+              >
+            </template>
           </v-data-table>
         </div>
       </div>
@@ -170,14 +179,14 @@ export default {
           text: "Order Code",
           align: "start",
           sortable: true,
-          value: "name"
+          value: "code"
         },
         { text: "Seller", value: "seller" },
         { text: "Buyer", value: "buyer" },
         { text: "Product Id", value: "product_id" },
         { text: "Actions", value: "actions", sortable: false }
       ],
-      categories: [],
+      orders: [],
       editedIndex: -1,
       editedItem: {
         name: "",
@@ -215,18 +224,27 @@ export default {
       if (status == "Not Available" || status == "منتهي") return "red";
       else if (status == "Available" || status == "متوفر") return "green";
     },
-    initialize() {},
+    initialize() {
+      this.orders = [
+        {
+          code: 111111111111,
+          seller: "abo alaa",
+          buyer: "mahmod salah",
+          product_id: "1"
+        }
+      ];
+    },
 
     editItem(item) {
-      this.editedIndex = this.categories.indexOf(item);
+      this.editedIndex = this.orders.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
 
     deleteItem(item) {
-      const index = this.categories.indexOf(item);
+      const index = this.orders.indexOf(item);
       confirm("You Are Sure To Delete This Item?") &&
-        this.categories.splice(index, 1);
+        this.orders.splice(index, 1);
     },
 
     close() {
@@ -239,9 +257,9 @@ export default {
 
     save() {
       if (this.editedIndex > -1) {
-        Object.assign(this.categories[this.editedIndex], this.editedItem);
+        Object.assign(this.orders[this.editedIndex], this.editedItem);
       } else {
-        this.categories.push(this.editedItem);
+        this.orders.push(this.editedItem);
       }
       this.close();
     }

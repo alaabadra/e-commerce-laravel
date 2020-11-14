@@ -62,73 +62,77 @@
                       <v-icon large>mdi-plus-circle</v-icon>
                     </v-btn>
                   </template>
-
-                  <v-card class="w-50 mx-auto">
-                    <v-card-title>
-                      <v-alert
-                        class="col-sm-12 mx-auto white--text font-2 text-center"
-                        color="black"
-                      >
-                        <i class="far list-alt mr-3"></i> Categories Management
-                      </v-alert>
-                    </v-card-title>
-                    <v-card-text>
-                      <div class="row">
-                        <v-text-field
-                          class="col-sm-5 mr-auto"
-                          outlined
-                          dense
-                          label="Category Name"
-                          v-model="editedItem.name"
-                        ></v-text-field>
-                        <v-autocomplete
-                          :items="status"
-                          class="col-sm-5 ml-auto"
-                          outlined
-                          dense
-                          label="Status"
-                          v-model="editedItem.status"
-                        >
-                        </v-autocomplete>
-                        <div class="col-sm-5 mx-auto row">
-                          <v-tooltip top>
-                            <template v-slot:activator="{ on, attrs }">
-                              <v-btn
-                                fab
-                                v-bind="attrs"
-                                v-on="on"
-                                size="24"
-                                class="mx-auto"
-                                color="blue darken-3"
-                                dark
-                                @click="save()"
-                              >
-                                <v-icon>mdi-content-save-all</v-icon>
-                              </v-btn>
-                            </template>
-                            <span>Save</span>
-                          </v-tooltip>
-                          <v-tooltip top>
-                            <template v-slot:activator="{ on, attrs }">
-                              <v-btn
-                                fab
-                                v-bind="attrs"
-                                v-on="on"
-                                size="24"
-                                class="mx-auto"
-                                color="amber darken-3"
-                                dark
-                                @click="close()"
-                              >
-                                <v-icon>mdi-reply-all</v-icon>
-                              </v-btn>
-                            </template>
-                            <span>Back</span>
-                          </v-tooltip>
-                        </div>
-                      </div>
-                    </v-card-text>
-                  </v-card>
+                  <div class="container">
+                    <div class="row">
+                      <v-card class="col-sm-6 mx-auto">
+                        <v-card-title>
+                          <v-alert
+                            class="col-sm-12 mx-auto white--text font-2 text-center"
+                            color="black"
+                          >
+                            <i class="far list-alt mr-3"></i> Categories
+                            Management
+                          </v-alert>
+                        </v-card-title>
+                        <v-card-text>
+                          <div class="row">
+                            <v-text-field
+                              class="col-sm-5 mx-auto"
+                              outlined
+                              dense
+                              label="Category Name"
+                              v-model="editedItem.name"
+                            ></v-text-field>
+                            <v-autocomplete
+                              :items="status"
+                              class="col-sm-5 mx-auto"
+                              outlined
+                              dense
+                              label="Status"
+                              v-model="editedItem.status"
+                            >
+                            </v-autocomplete>
+                            <div class="col-sm-5 mx-auto row">
+                              <v-tooltip top>
+                                <template v-slot:activator="{ on, attrs }">
+                                  <v-btn
+                                    fab
+                                    v-bind="attrs"
+                                    v-on="on"
+                                    size="24"
+                                    class="mx-auto"
+                                    color="blue darken-3"
+                                    dark
+                                    @click="save()"
+                                  >
+                                    <v-icon>mdi-content-save-all</v-icon>
+                                  </v-btn>
+                                </template>
+                                <span>Save</span>
+                              </v-tooltip>
+                              <v-tooltip top>
+                                <template v-slot:activator="{ on, attrs }">
+                                  <v-btn
+                                    fab
+                                    v-bind="attrs"
+                                    v-on="on"
+                                    size="24"
+                                    class="mx-auto"
+                                    color="amber darken-3"
+                                    dark
+                                    @click="close()"
+                                  >
+                                    <v-icon>mdi-reply-all</v-icon>
+                                  </v-btn>
+                                </template>
+                                <span>Back</span>
+                              </v-tooltip>
+                            </div>
+                          </div>
+                        </v-card-text>
+                      </v-card>
+                    </div>
+                  </div>
                 </v-dialog>
               </v-toolbar>
             </template>

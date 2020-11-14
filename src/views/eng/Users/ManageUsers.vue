@@ -56,7 +56,6 @@
                       v-bind="attrs"
                       v-on="on"
                       icon
-                      to="/addemp"
                       ><v-icon>mdi-plus-circle</v-icon></v-btn
                     >
                   </template>
@@ -66,114 +65,112 @@
                       More info about {{ item.name }}
                     </td>
                   </template>
-                  <v-card class="col-sm-7 mx-auto">
-                    <v-card-title>
-                      <v-alert
-                        class="col-sm-12 mx-auto white--text font-2 text-center"
-                        color="black"
-                      >
-                        <i class="fas fa-user-tie mr-3"></i> Employees
-                        Management
-                      </v-alert>
-                    </v-card-title>
-                    <v-card-text>
-                      <div class="row">
-                        <v-text-field
-                          class="col-sm-5 mr-auto"
-                          outlined
-                          dense
-                          label="Employee Name"
-                          v-model="editedItem.name"
-                        ></v-text-field>
-                        <v-text-field
-                          class="col-sm-5 ml-auto"
-                          outlined
-                          dense
-                          label="Email"
-                          v-model="editedItem.email"
-                        ></v-text-field>
-                        <v-text-field
-                          :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
-                          :rules="[rules.required, rules.min]"
-                          :type="show ? 'text' : 'password'"
-                          name="input-10-2"
-                          hint="At least 8 characters"
-                          @click:append="show = !show"
-                          v-model="password"
-                          class="col-sm-5 mr-auto"
-                          outlined
-                          dense
-                          label="New Password"
-                        ></v-text-field>
-                        <v-text-field
-                          :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
-                          :rules="[rules.required, rules.min, rules.passMatch]"
-                          :type="show ? 'text' : 'password'"
-                          name="input-10-2"
-                          hint="At least 8 characters"
-                          @click:append="show = !show"
-                          v-model="confirmPass"
-                          class="col-sm-5 ml-auto"
-                          outlined
-                          dense
-                          label="Confirm Password"
-                        ></v-text-field>
-                        <v-text-field
-                          class="col-sm-5 mr-auto"
-                          outlined
-                          dense
-                          label="Address"
-                          v-model="editedItem.address"
-                        ></v-text-field>
-                        <v-text-field
-                          class="col-sm-5 ml-auto"
-                          outlined
-                          dense
-                          label="Phone"
-                          v-model="editedItem.phone"
-                        ></v-text-field>
-                        <v-autocomplete
-                          class="col-sm-5 mr-auto"
-                          outlined
-                          dense
-                          label="Group"
-                          :items="groups"
-                          v-model="editedItem.group"
-                        ></v-autocomplete>
-                        <v-text-field
-                          class="col-sm-5 ml-auto"
-                          outlined
-                          dense
-                          label="National Id"
-                          v-model="editedItem.nationalId"
-                        ></v-text-field>
-                        <div class="col-sm-5 mx-auto row">
-                          <v-btn
-                            color="blue lighten-1"
-                            class="col-sm-5 mx-auto  white--text"
-                            @click="save()"
-                            >Save <i class="fas fa-file mr-3"></i
-                          ></v-btn>
-                          <v-btn
-                            color="amber darken-3"
-                            class="col-sm-5 mx-auto  white--text"
-                            @click="close()"
-                            >Back<i class="fas fa-share mr-3"></i
-                          ></v-btn>
-                        </div>
-                      </div>
-                    </v-card-text>
-
-                    <!-- <v-card-actions>
-                      <v-spacer></v-spacer>
-                      <v-btn color="blue darken-1" text @click="close"
-                        >Cancel</v-btn
-                      >
-                      <v-btn color="blue darken-1" text @click="save"
-                        >Save</v-btn
-                      >
-                    </v-card-actions> -->
-                  </v-card>
+                  <div class="container">
+                    <div class="row">
+                      <v-card class="col-sm-7 mx-auto">
+                        <v-card-title>
+                          <v-alert
+                            class="col-sm-12 mx-auto white--text font-2 text-center"
+                            color="black"
+                          >
+                            <v-icon dark large>mdi-account-circle</v-icon> User
+                            Management
+                          </v-alert>
+                        </v-card-title>
+                        <v-card-text>
+                          <div class="row">
+                            <v-text-field
+                              class="col-sm-5 mx-auto"
+                              outlined
+                              dense
+                              label="Employee Name"
+                              v-model="editedItem.name"
+                            ></v-text-field>
+                            <v-text-field
+                              class="col-sm-5 mx-auto"
+                              outlined
+                              dense
+                              label="Email"
+                              v-model="editedItem.email"
+                            ></v-text-field>
+                            <v-text-field
+                              :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
+                              :rules="[rules.required, rules.min]"
+                              :type="show ? 'text' : 'password'"
+                              name="input-10-2"
+                              hint="At least 8 characters"
+                              @click:append="show = !show"
+                              v-model="password"
+                              class="col-sm-5 mx-auto"
+                              outlined
+                              dense
+                              label="New Password"
+                            ></v-text-field>
+                            <v-text-field
+                              :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
+                              :rules="[
+                                rules.required,
+                                rules.min,
+                                rules.passMatch
+                              ]"
+                              :type="show ? 'text' : 'password'"
+                              name="input-10-2"
+                              hint="At least 8 characters"
+                              @click:append="show = !show"
+                              v-model="confirmPass"
+                              class="col-sm-5 mx-auto"
+                              outlined
+                              dense
+                              label="Confirm Password"
+                            ></v-text-field>
+                            <v-text-field
+                              class="col-sm-5 mx-auto"
+                              outlined
+                              dense
+                              label="Address"
+                              v-model="editedItem.address"
+                            ></v-text-field>
+                            <v-text-field
+                              class="col-sm-5 mx-auto"
+                              outlined
+                              dense
+                              label="Phone"
+                              v-model="editedItem.phone"
+                            ></v-text-field>
+                            <v-autocomplete
+                              class="col-sm-5 mx-auto"
+                              outlined
+                              dense
+                              label="Group"
+                              :items="groups"
+                              v-model="editedItem.group"
+                            ></v-autocomplete>
+                            <v-text-field
+                              class="col-sm-5 mx-auto"
+                              outlined
+                              dense
+                              label="National Id"
+                              v-model="editedItem.nationalId"
+                            ></v-text-field>
+                            <div class="col-sm-5 mx-auto row">
+                              <v-btn
+                                color="blue lighten-1"
+                                class="col-sm-5 mx-auto  white--text"
+                                @click="save()"
+                                >Save <i class="fas fa-file mr-3"></i
+                              ></v-btn>
+                              <v-btn
+                                color="amber darken-3"
+                                class="col-sm-5 mx-auto  white--text"
+                                @click="close()"
+                                >Back<i class="fas fa-share mr-3"></i
+                              ></v-btn>
+                            </div>
+                          </div>
+                        </v-card-text>
+                      </v-card>
+                    </div>
+                  </div>
                 </v-dialog>
               </v-toolbar>
             </template>

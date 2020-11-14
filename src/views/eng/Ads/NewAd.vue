@@ -20,7 +20,7 @@
           >
             <v-icon dark large>mdi-book-variant</v-icon> Products Management
           </v-alert>
-          <v-combobox
+          <!-- <v-combobox
             dense
             solo
             rounded
@@ -28,14 +28,15 @@
             label="Ad Type"
             :items="adTypes"
             class="col-sm-5 mr-auto"
-          ></v-combobox>
+          ></v-combobox> -->
           <v-text-field
             dense
             solo
             rounded
             color="black"
-            label="number of pictuers"
-            class="col-sm-5 ml-auto"
+            label="WebSite Or Product Link"
+            class="col-sm-12 ml-auto"
+            prepend-inner-icon="mdi-link"
           ></v-text-field>
           <v-btn
             color="primary"
@@ -49,23 +50,6 @@
           <input type="file" hidden ref="imgUpload" />
 
           <!-- multiple videos -->
-          <v-carousel v-model="model">
-            <v-carousel-item v-for="color in colors" :key="color">
-              <v-sheet :color="color" height="100%" tile>
-                <v-row class="fill-height" align="center" justify="center">
-                  <v-btn
-                    color="primary"
-                    class="col-sm-12 mr-auto text-center uploadedImg p-0"
-                    style="height:25rem;"
-                    dark
-                    @click="openFile()"
-                  >
-                    <v-icon x-large>mdi-file-image</v-icon>
-                  </v-btn>
-                </v-row>
-              </v-sheet>
-            </v-carousel-item>
-          </v-carousel>
 
           <label class="col-sm-12 font-2 text-left">Description</label>
           <VueEditor
@@ -144,7 +128,11 @@ export default {
       i: 0,
       model: 0,
       colors: ["primary", "secondary", "yellow darken-2", "red", "orange"],
-      adTypes: ["Single Picture", "Multiple Pictuers", "Video"]
+      adTypes: ["Single Picture", "Multiple Pictuers", "Video"],
+      adType: null,
+      multi: false,
+      single: true,
+      vid: false
     };
   },
   mounted() {
