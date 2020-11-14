@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Delivery;
 use App\Models\Pincode;
 use Illuminate\Http\Request;
+use DB;
 
 class PincodesController extends Controller
 {
@@ -30,20 +31,6 @@ class PincodesController extends Controller
         
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        $deliveries=Delivery::pincodes()->get();
-        return response()->json([
-            'status'=>200,
-            'dataDeliveries'=>$deliveries
-        ]);
-       // return view('carts.create');
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -97,33 +84,6 @@ class PincodesController extends Controller
 
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        try{
-            $pincode=Pincode::find($id);
-            if(!$pincode){
-                return response()->json([
-                    'status'=>404,
-                    'message'=>'This Pincode id not exist'
-                ]);
-            }else{
-                
-            }
-            
-        }catch(\Exception $ex){
-            DB::rollback();
-            return response()->json([
-                'status'=>500,
-                'message'=>'There is something wrong, please try again'
-            ]);
-        }
-    }
 
     /**
      * Update the specified resource in storage.
@@ -167,7 +127,7 @@ class PincodesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function delete($id)
     {
         try{
             $pincode=Pincode::find($id);

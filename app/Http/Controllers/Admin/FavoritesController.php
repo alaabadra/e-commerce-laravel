@@ -6,7 +6,7 @@ use App\Models\Favorite;
 use App\Models\Product;
 use App\Models\ProductAttribute;
 use Illuminate\Http\Request;
-
+use DB;
 class FavoritesController extends Controller
 {
         /**
@@ -56,22 +56,22 @@ class FavoritesController extends Controller
      */
     public function store(Request $request)
     {
-        try{
+         try{
             $data=$request->all();
             DB::beginTransaction();
-            Favorite::insert(['user_id'=>$data['user_id'],'product_id'=>$data['product_id']]);
+            Favorite::insert(['user_id'=>$data['user_id'],'product_attr_id'=>$data['product_attr_id']]);
             DB::commit();
             return response()->json([
                 'status'=>200,
                 'message'=>'added new Favorite succefully'
             ]);
-        }catch(\Exception $ex){
-            DB::rollback();
-            return response()->json([
-                'status'=>500,
-                'message'=>'There is something wrong, please try again'
-            ]);
-        }
+         }catch(\Exception $ex){
+             DB::rollback();
+             return response()->json([
+                 'status'=>500,
+                 'message'=>'There is something wrong, please try again'
+             ]);
+         }
     }
 
     /**
@@ -147,7 +147,7 @@ class FavoritesController extends Controller
             }else{
                 $data=$request->all();
                 DB::beginTransaction();
-                Favorite::where(['id'=>$id])->update(['name'=>$data['name'],'abbr'=>$data['abbr'],'active'=>$data['active']]);
+                Favorite::where(['id'=>$id])->update(['user_id'=>$data['user_id'],'product_attr_id'=>$data['product_attr_id']]);
                 DB::commit();
                 return response()->json([
                     'status'=>200,
@@ -170,7 +170,7 @@ class FavoritesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function delete($id)
     {
         try{
             $favorite=Favorite::find($id);

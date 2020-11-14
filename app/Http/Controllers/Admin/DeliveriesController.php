@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Delivery;
 use Illuminate\Http\Request;
-
+use DB;
 class DeliveriesController extends Controller
 {
     /**
@@ -52,7 +52,7 @@ class DeliveriesController extends Controller
      */
     public function store(Request $request)
     {
-        try{
+         try{
             $data=$request->all();
             DB::beginTransaction();
             Delivery::insert(['user_id'=>$data['user_id'],'delivery_status'=>$data['delivery_status']]);
@@ -61,13 +61,13 @@ class DeliveriesController extends Controller
                 'status'=>200,
                 'message'=>'added new delivery succefully'
             ]);
-        }catch(\Exception $ex){
-            DB::rollback();
-            return response()->json([
-                'status'=>500,
-                'message'=>'There is something wrong, please try again'
-            ]);
-        }
+         }catch(\Exception $ex){
+             DB::rollback();
+             return response()->json([
+                 'status'=>500,
+                 'message'=>'There is something wrong, please try again'
+             ]);
+         }
     }
 
     /**
@@ -166,7 +166,7 @@ class DeliveriesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function delete($id)
     {
         try{
             $delivery=Delivery::find($id);

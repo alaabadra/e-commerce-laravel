@@ -4,10 +4,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\NewsLetterSubscriber;
 use Illuminate\Http\Request;
+use DB;
 
 class NewsletterSubscribersController extends Controller
 {
-            /**
+    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
@@ -27,16 +28,6 @@ class NewsletterSubscribersController extends Controller
             ]);  
         }
         
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        return view('carts.create');
     }
 
     /**
@@ -75,7 +66,7 @@ class NewsletterSubscribersController extends Controller
     {
         try{
             DB::beginTransaction();
-            $newsLetter=NewsLetterSubscriber::find($id);
+            $newsLetter=DB::table('news_letter_subscribers')->find($id);
             DB::commit();
             return response()->json([
                 'status'=>200,
@@ -91,33 +82,6 @@ class NewsletterSubscribersController extends Controller
 
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        try{
-            $newsLetter=NewsLetterSubscriber::find($id);
-            if(!$newsLetter){
-                return response()->json([
-                    'status'=>404,
-                    'message'=>'This NewsLetterSubscriber id not exist'
-                ]);
-            }else{
-                
-            }
-            
-        }catch(\Exception $ex){
-            DB::rollback();
-            return response()->json([
-                'status'=>500,
-                'message'=>'There is something wrong, please try again'
-            ]);
-        }
-    }
 
     /**
      * Update the specified resource in storage.
@@ -161,7 +125,7 @@ class NewsletterSubscribersController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function delete($id)
     {
         try{
             $newsLetter=NewsLetterSubscriber::find($id);

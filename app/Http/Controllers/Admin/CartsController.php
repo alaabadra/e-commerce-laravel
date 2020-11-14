@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Cart;
 use Illuminate\Http\Request;
-
+use DB;
 class CartsController extends Controller
 {
             /**
@@ -29,15 +29,7 @@ class CartsController extends Controller
         
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        return view('carts.create');
-    }
+
 
     /**
      * Store a newly created resource in storage.
@@ -47,22 +39,22 @@ class CartsController extends Controller
      */
     public function store(Request $request)
     {
-        try{
+         try{
             $data=$request->all();
             DB::beginTransaction();
-            Cart::insert(['cart_color'=>$data['cart_color'],'cart_size'=>$data['cart_size'],'cart_status'=>$data['cart_status']]);
+            Cart::insert(['user_id'=>1,'sub_total'=>10,'total'=>1,'tax'=>1,'cart_color'=>$data['cart_color'],'cart_size'=>$data['cart_size'],'cart_status'=>$data['cart_status']]);
             DB::commit();
             return response()->json([
                 'status'=>200,
                 'message'=>'added new cart succefully'
             ]);
-        }catch(\Exception $ex){
-            DB::rollback();
-            return response()->json([
-                'status'=>500,
-                'message'=>'There is something wrong, please try again'
-            ]);
-        }
+         }catch(\Exception $ex){
+             DB::rollback();
+             return response()->json([
+                 'status'=>500,
+                 'message'=>'There is something wrong, please try again'
+             ]);
+         }
     }
 
     /**
@@ -138,7 +130,7 @@ class CartsController extends Controller
             }else{
                 $data=$request->all();
                 DB::beginTransaction();
-                Cart::where(['id'=>$id])->update(['cart_color'=>$data['cart_color'],'cart_size'=>$data['cart_size'],'cart_status'=>$data['cart_status']]);
+                Cart::where(['id'=>$id])->update(['user_id'=>1,'sub_total'=>10,'total'=>1,'tax'=>1,'cart_color'=>$data['cart_color'],'cart_size'=>$data['cart_size'],'cart_status'=>$data['cart_status']]);
                 DB::commit();
                 return response()->json([
                     'status'=>200,

@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\Request;
+use DB;
 
 class OrdersController extends Controller
 {
@@ -55,22 +56,22 @@ class OrdersController extends Controller
      */
     public function store(Request $request)
     {
-        try{
+         try{
             $data=$request->all();
             DB::beginTransaction();
-            Order::insert(['order_payment_method'=>$data['order_payment_method'],'order_number'=>$data['order_number'],'user_id'=>$data['user_id'],'delivery_id'=>$data['devlivery_id'],'order_price'=>$data['order_price'],'order_status'=>$data['order_status'],'order_shipping_tax'=>$data['order_shipping_tax'],'order_shipping_cost'=>$data['order_shipping_cost']]);
+            Order::insert(['order_payment_method'=>$data['order_payment_method'],'order_number'=>$data['order_number'],'user_id'=>$data['user_id'],'delivery_id'=>$data['delivery_id'],'order_price'=>$data['order_price'],'order_status'=>$data['order_status'],'order_shipping_tax'=>$data['order_shipping_tax'],'order_shipping_cost'=>$data['order_shipping_cost']]);
             DB::commit();
             return response()->json([
                 'status'=>200,
                 'message'=>'added new Order succefully'
             ]);
-        }catch(\Exception $ex){
-            DB::rollback();
-            return response()->json([
-                'status'=>500,
-                'message'=>'There is something wrong, please try again'
-            ]);
-        }
+         }catch(\Exception $ex){
+             DB::rollback();
+             return response()->json([
+                 'status'=>500,
+                 'message'=>'There is something wrong, please try again'
+             ]);
+         }
     }
 
     /**
@@ -100,34 +101,6 @@ class OrdersController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        try{
-            $order=Order::find($id);
-            if(!$order){
-                return response()->json([
-                    'status'=>404,
-                    'message'=>'This Order id not exist'
-                ]);
-            }else{
-                
-            }
-            
-        }catch(\Exception $ex){
-            DB::rollback();
-            return response()->json([
-                'status'=>500,
-                'message'=>'There is something wrong, please try again'
-            ]);
-        }
-    }
-
-    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -146,7 +119,7 @@ class OrdersController extends Controller
             }else{
                 $data=$request->all();
                 DB::beginTransaction();
-                Order::where(['id'=>$id])->update(['order_payment_method'=>$data['order_payment_method'],'order_number'=>$data['order_number'],'user_id'=>$data['user_id'],'delivery_id'=>$data['devlivery_id'],'order_price'=>$data['order_price'],'order_status'=>$data['order_status'],'order_shipping_tax'=>$data['order_shipping_tax'],'order_shipping_cost'=>$data['order_shipping_cost']]);
+                Order::where(['id'=>$id])->update(['order_payment_method'=>$data['order_payment_method'],'order_number'=>$data['order_number'],'user_id'=>$data['user_id'],'delivery_id'=>$data['delivery_id'],'order_price'=>$data['order_price'],'order_status'=>$data['order_status'],'order_shipping_tax'=>$data['order_shipping_tax'],'order_shipping_cost'=>$data['order_shipping_cost']]);
                 DB::commit();
                 return response()->json([
                     'status'=>200,
@@ -169,7 +142,7 @@ class OrdersController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function delete($id)
     {
         try{
             $order=Order::find($id);

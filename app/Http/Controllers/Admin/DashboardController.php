@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Language;
+use App\Models\Product;
+use App\Models\ProductAttribute;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 
 class DashboardController extends Controller
 {
@@ -17,13 +20,10 @@ class DashboardController extends Controller
         $totalStatusProdAttrs=0;
         $totalPopularProdAttrs=0;
         $totalFeatureProdAttrs=0;
-
         foreach($products as $prod){
             $prodAttrs=ProductAttribute::where(['product_id'=>$prod->id])->get();
             foreach($prodAttrs as $prodAttr){
-                
                 $totalQuantitiesProdAttrs+=$prodAttr->quantity;//total all quanutities for this product
-                
                 $totalStatusProdAttrs+=$prodAttr->product_status;//total all status for this product
                 $totalPopularProdAttrs+=$prodAttr->product_popular;//total all popular for this product
                 $totalFeatureProdAttrs+=$prodAttr->product_feature;//total all feature for this product
@@ -39,7 +39,12 @@ class DashboardController extends Controller
     
     public function storeDefaultLanguages(){
         $localLang= Config::get('app.locale');
-        Language::insert(['abbr'=>$localLang]);
+        if($localLang=='ar'){
+            Language::insert(['language_abbr'=>$localLang,'language_direction'=>'rtl-ltl']);
+        }else{
+            Language::insert(['language_abbr'=>$localLang,'language_direction'=>'ltl-rtl']);
+
+        }
         return response()->json([
             'status'=>200,
             "message"=>'added the default lang successfully'

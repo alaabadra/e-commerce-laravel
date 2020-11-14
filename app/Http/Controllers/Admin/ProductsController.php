@@ -5,7 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
-
+use DB;
 class ProductsController extends Controller
 {
     /**
@@ -46,77 +46,114 @@ class ProductsController extends Controller
             $data=$request->all();
             DB::beginTransaction();
             $resultLangDefaultInTableLang= forDefaultLang();
-            Product::insert(['category_id'=>$data['category_id'],'language_id'=>$resultLangDefaultInTableLang->id,'product_translation_of'=>0,'product_name'=>$data['product_name'],'product_language'=>$data['product_language'],'product_translation_of'=>$data['product_translation_of'],'product_image'=>$data['product_image'],'product_price'=>$data['product_price'],'product_quantity'=>$data['product_quantity'],'product_url'=>$data['product_url'],'product_type'=>$data['product_type'],'product_status'=>'product_quantity','product_price'=>$data['product_price'],'product_quantity'=>$data['product_quantity'],'product_url'=>$data['product_url'],'product_type'=>$data['product_type'],'product_status'=>$data['product_status'],'product_status'=>$data['product_status']]);
-            DB::commit();
-            return response()->json([
-                'status'=>200,
-                'message'=>'added new Product succefully'
-            ]);
-        }catch(\Exception $ex){
-            DB::rollback();
-            return response()->json([
-                'status'=>500,
-                'message'=>'There is something wrong, please try again'
-            ]);
-        }
-    }
+            if($resultLangDefaultInTableLang!==0){
+                //upload image
+                $filePath="";
+                if($request->has('product_image')){
+                    $filePath=uploadImage('admins',$request->product_image);
+                }
+                //to avoid store default name Product  more than one
+                $countNameProduct= Product::where(['product_name'=>$data['product_name'],'language_id'=>$resultLangDefaultInTableLang->id,'product_translation_of'=>null])->count();
+                if($countNameProduct!==0){
+                    return response()->json([
+                        'status'=>200,
+                        'message'=>'You cannt add this Product , because is exist same this Product for same this default language'
+                    ]);
+                }else{
+                    Product::insert(['category_id'=>$data['category_id'],'language_id'=>$resultLangDefaultInTableLang->id,'product_translation_of'=>null,'product_name'=>$data['product_name'],'product_image'=>$filePath,'product_price'=>$data['product_price'],'product_quantity'=>$data['product_quantity'],'product_type'=>$data['product_type'],'product_status'=>'product_quantity','product_price'=>$data['product_price'],'product_quantity'=>$data['product_quantity'],'product_type'=>$data['product_type'],'product_status'=>$data['product_status']]);
+                    DB::commit();
+                    return response()->json([
+                        'status'=>200,
+                        'message'=>'added new Product succefully'
+                    ]);
+                }
+            }else{
+                $routeViewDashboard=route('admin.dashboard.generate_default_lang');
+                return response()->json([
+                    'status'=>500,
+                    'message'=>'There is something wrong, please try again, because this website not contain on the default language , pls click here to generate it'.$routeViewDashboard.'after that you can return into this route'
+                    ]);
+                    
+            }
+         }catch(\Exception $ex){
+             DB::rollback();
+             return response()->json([
+                 'status'=>500,
+                 'message'=>'There is something wrong, please try again'
+             ]);
+         }
+     }
 
     public function storeProductForAnyLang(Request $request)
     {
         try{
             $data=$request->all();
             DB::beginTransaction();
-            $resultLanguage= forAnyLang($data['product_translation_of'],$data['language_id']);
-            if($resultLanguage==true){
-                if($data['product_translation_of']!==0){
-                    $defaultProductCount= product::where(['product_translation_of'=>0])->count();
-                    if($defaultProductCount!==0){//if exist any product for the default language 
-                        $defaultCategories= product::where(['product_translation_of'=>0])->get();
-                        $arrDefaultCategories=[];
-                        foreach($defaultCategories as $defaultproduct){
-                            $arrDefaultCategories.push($defaultproduct->id);
-                        }
-                        $isContain=  $arrDefaultCategories.includes($data['product_translation_of']);
-                        if($isContain){
-                            Product::insert(['category_id'=>$data['category_id'],'language_id'=>$data['language_id'],'product_translation_of'=>$data['product_translation_of'],'product_translation_of'=>0,'product_name'=>$data['product_name'],'product_language'=>$data['product_language'],'product_translation_of'=>$data['product_translation_of'],'product_image'=>$data['product_image'],'product_price'=>$data['product_price'],'product_quantity'=>$data['product_quantity'],'product_url'=>$data['product_url'],'product_type'=>$data['product_type'],'product_status'=>'product_quantity','product_price'=>$data['product_price'],'product_quantity'=>$data['product_quantity'],'product_url'=>$data['product_url'],'product_type'=>$data['product_type'],'product_status'=>$data['product_status'],'product_status'=>$data['product_status']]);
-                            DB::commit();
-                            return response()->json([
-                                'status'=>200,
-                                'message'=>'added new Product succefully'
-                            ]);
-                        }else{
-                            return response()->json([
-                                'status'=>403,
-                                'message'=>'You cannt put product_translation_of as this number because  this number not belongs to any id default product'
-                            ]); 
-                        }
-                    }else{
-                        $routeStoreDefaultMainproduct=route('/admin/categories/store_any_main_product');
-                        return response()->json([
-                            'status'=>403,
-                            'message'=>'You cannt put product_translation_of as this number , because until now not exist any product for default language , so you can add a product for default language from here  '.$routeStoreDefaultMainproduct.'after that you can return into here to add your product for default product'
-                        ]);  
+             $resultLanguage= forAnyLang($data['product_translation_of'],$data['language_id']);
+             if($resultLanguage==true){
+                 $defaultProductCount= product::where(['product_translation_of'=>null])->count();
+                 if($defaultProductCount!==0){//if exist any product for the default language 
+                    $defaultProducts= product::where(['product_translation_of'=>null])->get();
+                    $arrDefaultProducts=[];
+                    foreach($defaultProducts as $defaultProduct){
+                        array_push($arrDefaultProducts, $defaultProduct->id);
                     }
-                }else{
+                        if($data['product_translation_of']!==null){
+                            $isContain=  in_array($data['product_translation_of'],$arrDefaultProducts);
+                            if($isContain){
+                                //upload image
+                                $filePath="";
+                                if($request->has('product_image')){
+                                    $filePath=uploadImage('product_images',$request->product_image);
+                                }
+                                $countNameProduct= Product::where(['product_name'=>$data['product_name'],'language_id'=>$data['language_id'],'product_translation_of'=>$data['product_translation_of']])->count();
+                                if($countNameProduct!==0){
+                                    return response()->json([
+                                        'status'=>200,
+                                        'message'=>'You cannt add this product , because is exist same this product for same this  language'
+                                    ]);
+                                }else{
+                                    Product::insert(['category_id'=>$data['category_id'],'language_id'=>$data['language_id'],'product_translation_of'=>$data['product_translation_of'],'product_translation_of'=>0,'product_name'=>$data['product_name'],'product_translation_of'=>$data['product_translation_of'],'product_image'=>$data['product_image'],'product_price'=>$data['product_price'],'product_quantity'=>$data['product_quantity'],'product_type'=>$data['product_type'],'product_status'=>'product_quantity','product_price'=>$data['product_price'],'product_quantity'=>$data['product_quantity'],'product_type'=>$data['product_type'],'product_status'=>$data['product_status'],'product_status'=>$data['product_status']]);
+                                    DB::commit();
+                                    return response()->json([
+                                        'status'=>200,
+                                        'message'=>'added new Product succefully'
+                                    ]);
+                                }
+                            }else{
+                                return response()->json([
+                                    'status'=>403,
+                                    'message'=>'You cannt put product_translation_of as this number because  this number not belongs to any id default product'
+                                ]); 
+                            }
+                     }else{
                     return response()->json([
                         'status'=>403,
-                        'message'=>'You cannt put product_translation_of is 0 because this product not for default language'
+                        'message'=>'You cannt put product_translation_of is null because this product not for default language'
                     ]); 
-                }
+                }   
             }else{
+                $routeStoreDefaultProduct=route('admin.product.store_product_for_any_lang');
                 return response()->json([
                     'status'=>403,
-                    'message'=>'You cannt put this id for language , because this id not exist'
-                ]);     
+                    'message'=>'You cannt put product_translation_of as this number , because until now not exist any product for default language , so you can add a product for default language from here  '.$routeStoreDefaultProduct.'after that you can return into here to add your product for default product'
+                ]);  
             }
-        }catch(\Exception $ex){
-            DB::rollback();
+                
+        }else{
             return response()->json([
-                'status'=>500,
-                'message'=>'There is something wrong, please try again'
-            ]);
+                'status'=>403,
+                'message'=>'You cannt put this id for language , because this id not exist'
+            ]);     
         }
+    }catch(\Exception $ex){
+        DB::rollback();
+        return response()->json([
+            'status'=>500,
+            'message'=>'There is something wrong, please try again'
+        ]);
     }
+}
 
     /**
      * Display the specified resource.
@@ -183,15 +220,36 @@ class ProductsController extends Controller
                     'message'=>'This Product id not exist'
                 ]);
             }else{
-                $data=$request->all();
                 DB::beginTransaction();
                 $resultLangDefaultInTableLang= forDefaultLang();
-                Product::where(['id'=>$id])->update(['category_id'=>$data['category_id'],'language_id'=>$resultLangDefaultInTableLang->id,'product_translation_of'=>0,'product_name'=>$data['product_name'],'product_language'=>$data['product_language'],'product_translation_of'=>$data['product_translation_of'],'product_image'=>$data['product_image'],'product_price'=>$data['product_price'],'product_quantity'=>$data['product_quantity'],'product_url'=>$data['product_url'],'product_type'=>$data['product_type'],'product_status'=>'product_quantity','product_price'=>$data['product_price'],'product_quantity'=>$data['product_quantity'],'product_url'=>$data['product_url'],'product_type'=>$data['product_type'],'product_status'=>$data['product_status'],'product_status'=>$data['product_status']]);
-                DB::commit();
-                return response()->json([
-                    'status'=>200,
-                    'message'=>'updated'.$product->name.'succefully'
-                ]);
+                if($resultLangDefaultInTableLang!==0){
+                    $data=$request->all();
+                    //upload image
+                    $filePath="";
+                    if($request->has('product_image')){
+                        $filePath=uploadImage('admins',$request->product_image);
+                    }
+                    $countNameProduct= Product::where(['product_name'=>$data['product_name'],['id','!=',$id],'language_id'=>$resultLangDefaultInTableLang->id,'product_translation_of'=>$data['product_translation_of']])->count();
+                    if($countNameProduct!==0){
+                        return response()->json([
+                            'status'=>200,
+                            'message'=>'You cannt add this Product , because is exist same this Product for same this  language'
+                        ]);
+                    }else{
+                        Product::where(['id'=>$id])->update(['category_id'=>$data['category_id'],'language_id'=>$resultLangDefaultInTableLang->id,'product_translation_of'=>null,'product_name'=>$data['product_name'],'product_translation_of'=>$data['product_translation_of'],'product_image'=>$data['product_image'],'product_price'=>$data['product_price'],'product_quantity'=>$data['product_quantity'],'product_type'=>$data['product_type'],'product_status'=>'product_quantity','product_price'=>$data['product_price'],'product_quantity'=>$data['product_quantity'],'product_type'=>$data['product_type'],'product_status'=>$data['product_status'],'product_status'=>$data['product_status']]);
+                        DB::commit();
+                        return response()->json([
+                            'status'=>200,
+                            'message'=>'updated'.$product->name.'succefully'
+                        ]);
+                    }
+                }else{
+                    $routeViewDashboard=route('admin.dashboard.generate_default_lang');
+                    return response()->json([
+                        'status'=>500,
+                        'message'=>'There is something wrong, please try again, because this website not contain on the default language , pls click here to generate it'.$routeViewDashboard.'after that you can return into this route'
+                        ]); 
+                }
             }
             
         }catch(\Exception $ex){
@@ -204,7 +262,7 @@ class ProductsController extends Controller
     }
     public function updateProductForAnyLang(Request $request, $id)
     {
-        try{
+         try{
             $product=Product::find($id);
             if(!$product){
                 return response()->json([
@@ -214,52 +272,72 @@ class ProductsController extends Controller
             }else{
                 $data=$request->all();
                 DB::beginTransaction();
-                $resultLanguage= forAnyLang($data['product_translation_of'],$data['language_id']);
-                if($resultLanguage==true){
-                $defaultproductCount= Product::where(['product_translation_of'=>0])->count();
+                 $resultLanguage= forAnyLang($data['product_translation_of'],$data['language_id']);
+                 if($resultLanguage==true){
+                $defaultproductCount= Product::where(['product_translation_of'=>null])->count();
                 if($defaultproductCount!==0){//if exist any product for the default language 
-                    $defaultCategories= Product::where(['product_translation_of'=>0])->get();
-                    $arrDefaultCategories=[];
-                    foreach($defaultCategories as $defaultproduct){
-                        $arrDefaultCategories.push($defaultproduct->id);
+                    $defaultProducts= Product::where(['product_translation_of'=>null])->get();
+                    $arrDefaultProducts=[];
+                    foreach($defaultProducts as $defaultProduct){
+                        array_push($arrDefaultProducts, $defaultProduct->id);
                     }
-                    $isContain=  $arrDefaultCategories.includes($data['product_translation_of']);
-                    if($isContain){
-                Product::where(['id'=>$id])->update(['category_id'=>$data['category_id'],'language_id'=>$data['langauge_id'],'product_translation_of'=>$data['product_translation_of'],'product_name'=>$data['product_name'],'product_language'=>$data['product_language'],'product_translation_of'=>$data['product_translation_of'],'product_image'=>$data['product_image'],'product_price'=>$data['product_price'],'product_quantity'=>$data['product_quantity'],'product_url'=>$data['product_url'],'product_type'=>$data['product_type'],'product_status'=>'product_quantity','product_price'=>$data['product_price'],'product_quantity'=>$data['product_quantity'],'product_url'=>$data['product_url'],'product_type'=>$data['product_type'],'product_status'=>$data['product_status'],'product_status'=>$data['product_status']]);
-                DB::commit();
-                return response()->json([
-                    'status'=>200,
-                    'message'=>'updated'.$product->name.'succefully'
-                ]);
+                    if($data['product_translation_of']!==0){
+                        $isContain=  in_array($data['product_translation_of'],$arrDefaultProducts);
+                        if($isContain){
+                            $countNameProduct= Product::where(['product_name'=>$data['product_name'],['id','!=',$id],'language_id'=>$data['language_id'],'product_translation_of'=>$data['product_translation_of']])->count();
+                            if($countNameProduct!==0){
+                                return response()->json([
+                                    'status'=>200,
+                                    'message'=>'You cannt add this Product , because is exist same this Product for same this  language'
+                                ]);
+                            }else{
+                                //upload image
+                                $filePath="";
+                                if($request->has('product_image')){
+                                    $filePath=uploadImage('product_images',$request->product_image);
+                                }
+                                Product::where(['id'=>$id])->update(['category_id'=>$data['category_id'],'language_id'=>$data['language_id'],'product_translation_of'=>$data['product_translation_of'],'product_name'=>$data['product_name'],'product_image'=>$filePath,'product_price'=>$data['product_price'],'product_quantity'=>$data['product_quantity'],'product_type'=>$data['product_type'],'product_status'=>'product_quantity','product_price'=>$data['product_price'],'product_quantity'=>$data['product_quantity'],'product_type'=>$data['product_type'],'product_status'=>$data['product_status']]);
+                                DB::commit();
+                                return response()->json([
+                                    'status'=>200,
+                                    'message'=>'updated'.$product->name.'succefully'
+                                ]);
+                            }
+                        }else{
+                            return response()->json([
+                                'status'=>403,
+                                'message'=>'You cannt put product_translation_of as this number because  this number not belongs to any id default product'
+                            ]); 
+                        }
+                    }else{
+                        return response()->json([
+                            'status'=>403,
+                            'message'=>'You cannt put product_translation_of is null because this product not for default language'
+                        ]); 
+                    } 
+                }else{
+                    $routeStoreDefaultProduct=route('admin.product.store_product_for_any_lang');
+                    return response()->json([
+                        'status'=>403,
+                        'message'=>'You cannt put product_translation_of as this number , because until now not exist any product for default language , so you can add a product for default language from here  '.$routeStoreDefaultProduct. 'after that you can return into here to add your product for default product'
+                    ]);  
+                }         
             }else{
                 return response()->json([
                     'status'=>403,
-                    'message'=>'You cannt put product_translation_of as this number because  this number not belongs to any id default product'
-                ]); 
+                    'message'=>'You cannt put product_translation_of is null because this product not for default language'
+                ]);
             }
-        }else{
-            $routeStoreDefaultMainproduct=route('/admin/categories/store_any_main_product');
-            return response()->json([
-                'status'=>403,
-                'message'=>'You cannt put product_translation_of as this number , because until now not exist any product for default language , so you can add a product for default language from here  '.$routeStoreDefaultMainproduct.'after that you can return into here to add your product for default product'
-            ]);  
-        }         
-    }else{
+        }
+            
+    }catch(\Exception $ex){
+        DB::rollback();
         return response()->json([
-            'status'=>403,
-            'message'=>'You cannt put product_translation_of is 0 because this product not for default language'
+            'status'=>500,
+            'message'=>'There is something wrong, please try again'
         ]);
     }
-            }
-            
-        }catch(\Exception $ex){
-            DB::rollback();
-            return response()->json([
-                'status'=>500,
-                'message'=>'There is something wrong, please try again'
-            ]);
-        }
-    }
+}
 
     /**
      * Remove the specified resource from storage.
