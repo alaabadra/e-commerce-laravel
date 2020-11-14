@@ -21,8 +21,10 @@ class CreateProductAttributesTable extends Migration
             $table->foreign('product_id')->references('id')->on('products')->onUpdate('CASCADE')->onDelete('CASCADE');
             $table->unsignedBigInteger('language_id');
             $table->foreign('language_id')->references('id')->on('languages')->onUpdate('CASCADE')->onDelete('CASCADE');
-            $table->integer('product_attr_translation_of');
+            $table->unsignedBigInteger('product_attr_translation_of')->nullable();
+            $table->foreign('product_attr_translation_of')->references('id')->on('product_attributes')->onUpdate('CASCADE')->onDelete('CASCADE');         
             $table->integer('product_attr_price');
+            $table->string('product_attr_string')->nullable();
             $table->string('product_attr_image')->nullable();
             $table->string('product_attr_quantity')->nullable();
             $table->tinyInteger('product_attr_status')->default(0);

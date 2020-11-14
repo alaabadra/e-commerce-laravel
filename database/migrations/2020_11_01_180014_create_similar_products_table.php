@@ -20,7 +20,8 @@ class CreateSimilarProductsTable extends Migration
             $table->string('product_name')->nullable();
             $table->unsignedBigInteger('language_id');
             $table->foreign('language_id')->references('id')->on('languages')->onUpdate('CASCADE')->onDelete('CASCADE');         
-            $table->integer('product_translation_of');
+            $table->unsignedBigInteger('product_translation_of')->nullable();
+            $table->foreign('product_translation_of')->references('id')->on('similar_products')->onUpdate('CASCADE')->onDelete('CASCADE');         
             $table->string('product_image')->nullable();
             $table->integer('product_price');
             $table->string('product_quantity')->nullable();

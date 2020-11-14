@@ -19,9 +19,11 @@ class CreateProductsTable extends Migration
             $table->foreign('category_id')->references('id')->on('categories')->onUpdate('CASCADE')->onDelete('CASCADE');
             $table->unsignedBigInteger('language_id');
             $table->foreign('language_id')->references('id')->on('languages')->onUpdate('CASCADE')->onDelete('CASCADE');         
-            $table->integer('product_translation_of');
+            $table->unsignedBigInteger('product_translation_of')->nullable();
+            $table->foreign('product_translation_of')->references('id')->on('products')->onUpdate('CASCADE')->onDelete('CASCADE');         
             $table->string('product_name')->nullable();
             $table->string('product_image')->nullable();
+            $table->string('product_price')->nullable();
             $table->string('product_quantity')->nullable();
             $table->string('product_type')->nullable();
             $table->tinyInteger('product_status')->default(0);

@@ -20,8 +20,8 @@ class CreateCategoriesTable extends Migration
             $table->foreign('parent_id')->references('id')->on('categories')->onUpdate('CASCADE')->onDelete('CASCADE');
             $table->unsignedBigInteger('language_id');
             $table->foreign('language_id')->references('id')->on('languages')->onUpdate('CASCADE')->onDelete('CASCADE');         
-            $table->integer('category_translation_of');
-            $table->string('category_url')->nullable();
+            $table->unsignedBigInteger('category_translation_of')->nullable();
+            $table->foreign('category_translation_of')->references('id')->on('categories')->onUpdate('CASCADE')->onDelete('CASCADE');         
             $table->string('category_description')->nullable();
             $table->string('category_image')->nullable();
             $table->tinyInteger('category_status')->default(0);

@@ -17,8 +17,10 @@ class CreateAdminsTable extends Migration
             $table->id();
             $table->string('image');
             $table->string('name');
-            $table->string('admin_language');
-            $table->integer('admin_translation_of');
+            $table->unsignedBigInteger('language_id');
+            $table->foreign('language_id')->references('id')->on('languages')->onUpdate('CASCADE')->onDelete('CASCADE');         
+            $table->unsignedBigInteger('admin_translation_of')->nullable();
+            $table->foreign('admin_translation_of')->references('id')->on('admins')->onUpdate('CASCADE')->onDelete('CASCADE');         
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');

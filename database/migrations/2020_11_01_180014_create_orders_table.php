@@ -21,9 +21,12 @@ class CreateOrdersTable extends Migration
             
             $table->unsignedBigInteger('delivery_id');
             $table->foreign('delivery_id')->references('id')->on('deliveries')->onUpdate('CASCADE')->onDelete('CASCADE');
-            $table->integer('grand_total');
-            $table->integer('coupon_amount');
+            $table->integer('order_number');
+            $table->integer('order_price');
+            $table->integer('order_shipping_tax');
+            $table->integer('order_shipping_cost');
             $table->tinyInteger('order_status');
+            
             $table->timestamps();
         });
     }
