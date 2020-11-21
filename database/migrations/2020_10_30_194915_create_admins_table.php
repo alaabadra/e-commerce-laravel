@@ -15,16 +15,12 @@ class CreateAdminsTable extends Migration
     {
         Schema::create('admins', function (Blueprint $table) {
             $table->id();
-            $table->string('image');
+            $table->longText('image')->nullable();
             $table->string('name');
-            $table->unsignedBigInteger('language_id');
-            $table->foreign('language_id')->references('id')->on('languages')->onUpdate('CASCADE')->onDelete('CASCADE');         
-            $table->unsignedBigInteger('admin_translation_of')->nullable();
-            $table->foreign('admin_translation_of')->references('id')->on('admins')->onUpdate('CASCADE')->onDelete('CASCADE');         
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->tinyInteger('admin_status')->default(0);
+            $table->string('admin_status');
             $table->rememberToken();
             $table->timestamps();
         });

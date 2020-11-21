@@ -15,17 +15,16 @@ class CreateUsersTable extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('image');
+            $table->longText('image')->nullable();
             $table->string('name');
-            $table->unsignedBigInteger('language_id');
-            $table->foreign('language_id')->references('id')->on('languages')->onUpdate('CASCADE')->onDelete('CASCADE');
-            $table->unsignedBigInteger('user_translation_of')->nullable();
-            $table->foreign('user_translation_of')->references('id')->on('users')->onUpdate('CASCADE')->onDelete('CASCADE');         
+            $table->tinyInteger('status_confirmation')->default(0);
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->string('user_type');
-            $table->tinyInteger('user_status')->default(0);
+            $table->integer('phone');
+            $table->string('address');
+            $table->integer('num_card')->default(0);
+            $table->string('user_status');
             $table->rememberToken();
             $table->timestamps();
         });
