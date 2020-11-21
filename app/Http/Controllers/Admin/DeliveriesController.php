@@ -16,10 +16,17 @@ class DeliveriesController extends Controller
     {
         try{
             $deliveries=Delivery::with(["user"])->paginate(10);
-            return response()->json([
-                'status'=>200,
-                'message'=>$deliveries
-            ]);  
+            if(!empty($deliveries)){
+                return response()->json([
+                    'status'=>200,
+                    'message'=>$deliveries
+                ]);  
+            }else{
+                return response()->json([
+                    'status'=>404,
+                    'message'=>'there is no data'
+                ]);
+            }
         }catch(\Exception $ex){
             return response()->json([
                 'status'=>500,
@@ -29,19 +36,19 @@ class DeliveriesController extends Controller
         
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        $users=User::deliveries()->get();
+    public function getAllDeliveries(){
+        try{
+        $allDeliveries=Delivery::get();
         return response()->json([
             'status'=>200,
-            'dataUsers'=>$users
+            'message'=>$allDeliveries
         ]);
-        return view('carts.create');
+    }catch(\Exception $ex){
+        return response()->json([
+            'status'=>500,
+            'message'=>'There is something wrong, please try again'
+        ]);  
+    }
     }
 
     /**
@@ -52,22 +59,22 @@ class DeliveriesController extends Controller
      */
     public function store(Request $request)
     {
-         try{
+        // try{
             $data=$request->all();
             DB::beginTransaction();
-            Delivery::insert(['user_id'=>$data['user_id'],'delivery_status'=>$data['delivery_status']]);
+            Delivery::insert(['order_code'=>$data['order_code'],'deliver_company'=>$data['deliver_company'],'delivery_status'=>$data['delivery_status'],'deliver_num'=>$data['deliver_num'],'deliver_destination'=>$data['deliver_destination'],'deliver_name'=>$data['deliver_name']]);
             DB::commit();
             return response()->json([
                 'status'=>200,
                 'message'=>'added new delivery succefully'
             ]);
-         }catch(\Exception $ex){
-             DB::rollback();
-             return response()->json([
-                 'status'=>500,
-                 'message'=>'There is something wrong, please try again'
-             ]);
-         }
+        //  }catch(\Exception $ex){
+        //      DB::rollback();
+        //      return response()->json([
+        //          'status'=>500,
+        //          'message'=>'There is something wrong, please try again'
+        //      ]);
+        //  }
     }
 
     /**
@@ -81,40 +88,18 @@ class DeliveriesController extends Controller
         try{
             DB::beginTransaction();
             $delivery=Delivery::find($id);
-            DB::commit();
-            return response()->json([
-                'status'=>200,
-                'message'=>$delivery
-            ]);
-        }catch(\Exception $ex){
-            DB::rollback();
-            return response()->json([
-                'status'=>500,
-                'message'=>'There is something wrong, please try again'
-            ]);
-        }
-
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        try{
-            $delivery=Delivery::find($id);
-            if(!$delivery){
+            if(!empty($delivery)){
+                DB::commit();
                 return response()->json([
-                    'status'=>404,
-                    'message'=>'This delivery id not exist'
+                    'status'=>200,
+                    'message'=>$delivery
                 ]);
             }else{
-                
+                return response()->json([
+                    'status'=>404,
+                    'message'=>'there is no data'
+                ]);
             }
-            
         }catch(\Exception $ex){
             DB::rollback();
             return response()->json([
@@ -122,7 +107,10 @@ class DeliveriesController extends Controller
                 'message'=>'There is something wrong, please try again'
             ]);
         }
+
     }
+
+
 
     /**
      * Update the specified resource in storage.
@@ -133,7 +121,7 @@ class DeliveriesController extends Controller
      */
     public function update(Request $request, $id)
     {
-        try{
+        //try{
             $delivery=Delivery::find($id);
             if(!$delivery){
                 return response()->json([
@@ -143,7 +131,7 @@ class DeliveriesController extends Controller
             }else{
                 $data=$request->all();
                 DB::beginTransaction();
-                Delivery::where(['id'=>$id])->update(['user_id'=>$data['user_id'],'delivery_status'=>$data['delivery_status']]);
+                Delivery::where(['id'=>$id])->update(['order_code'=>$data['order_code'],'deliver_company'=>$data['deliver_company'],'delivery_status'=>$data['delivery_status'],'deliver_num'=>$data['deliver_num'],'deliver_destination'=>$data['deliver_destination'],'deliver_name'=>$data['deliver_name']]);
                 DB::commit();
                 return response()->json([
                     'status'=>200,
@@ -151,13 +139,13 @@ class DeliveriesController extends Controller
                 ]);
             }
             
-        }catch(\Exception $ex){
-            DB::rollback();
-            return response()->json([
-                'status'=>500,
-                'message'=>'There is something wrong, please try again'
-            ]);
-        }
+        // }catch(\Exception $ex){
+        //     DB::rollback();
+        //     return response()->json([
+        //         'status'=>500,
+        //         'message'=>'There is something wrong, please try again'
+        //     ]);
+        // }
     }
 
     /**

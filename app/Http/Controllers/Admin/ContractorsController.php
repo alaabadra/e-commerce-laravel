@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
-use App\Models\NewsLetterSubscriber;
+use App\Models\Contractor;
 use Illuminate\Http\Request;
 use DB;
-
-class NewsletterSubscribersController extends Controller
+class ContractorsController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,19 +15,19 @@ class NewsletterSubscribersController extends Controller
     public function index()
     {
         try{
-            $newsLetters=NewsLetterSubscriber::paginate(10);
-            return response()->json([
-                'status'=>200,
-                'message'=>$newsLetters
-            ]);  
-        }catch(\Exception $ex){
-            return response()->json([
-                'status'=>500,
-                'message'=>'There is something wrong, please try again'
-            ]);  
-        }
-        
+        $contractors=Contractor::get();
+        return response()->json([
+            'status'=>200,
+            'message'=>$contractors
+        ]);
+    }catch(\Exception $ex){
+        return response()->json([
+            'status'=>500,
+            'message'=>'There is something wrong, please try again'
+        ]);
     }
+    }
+
 
     /**
      * Store a newly created resource in storage.
@@ -38,22 +37,22 @@ class NewsletterSubscribersController extends Controller
      */
     public function store(Request $request)
     {
-        try{
+        // try{
             $data=$request->all();
             DB::beginTransaction();
-            NewsLetterSubscriber::insert(['email'=>$data['email'],'newsletter_subscriber_status'=>$data['newsletter_subscriber_status']]);
+            Contractor::insert(['contractor_name'=>$data['contractor_name'],'contractor_phone'=>$data['contractor_phone'],'contractor_address'=>$data['contractor_address'],'contractor_commission'=>$data['contractor_commission'],'start_date'=>$data['start_date'],'end_date'=>$data['end_date'],'contractor_status'=>$data['contractor_status']]);
             DB::commit();
             return response()->json([
                 'status'=>200,
-                'message'=>'added new NewsLetterSubscriber succefully'
+                'message'=>'added new Contractor succefully'
             ]);
-        }catch(\Exception $ex){
-            DB::rollback();
-            return response()->json([
-                'status'=>500,
-                'message'=>'There is something wrong, please try again'
-            ]);
-        }
+        //  }catch(\Exception $ex){
+        //      DB::rollback();
+        //      return response()->json([
+        //          'status'=>500,
+        //          'message'=>'There is something wrong, please try again'
+        //      ]);
+        //  }
     }
 
     /**
@@ -66,11 +65,11 @@ class NewsletterSubscribersController extends Controller
     {
         try{
             DB::beginTransaction();
-            $newsLetter=DB::table('news_letter_subscribers')->find($id);
+            $contractor=Contractor::find($id);
             DB::commit();
             return response()->json([
                 'status'=>200,
-                'message'=>$newsLetter
+                'message'=>$contractor
             ]);
         }catch(\Exception $ex){
             DB::rollback();
@@ -79,9 +78,7 @@ class NewsletterSubscribersController extends Controller
                 'message'=>'There is something wrong, please try again'
             ]);
         }
-
     }
-
 
     /**
      * Update the specified resource in storage.
@@ -93,20 +90,20 @@ class NewsletterSubscribersController extends Controller
     public function update(Request $request, $id)
     {
         try{
-            $newsLetter=NewsLetterSubscriber::find($id);
-            if(!$newsLetter){
+            $contractor=Contractor::find($id);
+            if(!$contractor){
                 return response()->json([
                     'status'=>404,
-                    'message'=>'This NewsLetterSubscriber id not exist'
+                    'message'=>'This co$contractor id not exist'
                 ]);
             }else{
                 $data=$request->all();
                 DB::beginTransaction();
-                NewsLetterSubscriber::where(['id'=>$id])->update(['email'=>$data['email'],'newsletter_subscriber_status'=>$data['newsletter_subscriber_status']]);
+                Contractor::where(['id'=>$id])->update(['contractor_name'=>$data['contractor_name'],'contractor_phone'=>$data['contractor_phone'],'contractor_address'=>$data['contractor_address'],'contractor_commission'=>$data['contractor_commission']]);
                 DB::commit();
                 return response()->json([
                     'status'=>200,
-                    'message'=>'updated'.$newsLetter->name.'succefully'
+                    'message'=>'updated'.$contractor->contractor_name.'succefully'
                 ]);
             }
             
@@ -125,22 +122,22 @@ class NewsletterSubscribersController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function delete($id)
+    public function destroy($id)
     {
         try{
-            $newsLetter=NewsLetterSubscriber::find($id);
-            if(!$newsLetter){
+            $contractor=Contractor::find($id);
+            if(!$contractor){
                 return response()->json([
                     'status'=>404,
-                    'message'=>'This NewsLetterSubscriber id not exist'
+                    'message'=>'This co$contractor id not exist'
                 ]);
             }else{
                 DB::beginTransaction();
-                $newsLetter->delete();
+                $contractor->delete();
                 DB::commit();
                 return response()->json([
                     'status'=>200,
-                    'message'=>'deleted this NewsLetterSubscriber succefully'
+                    'message'=>'deleted this co$contractor succefully'
                 ]);
             }
             

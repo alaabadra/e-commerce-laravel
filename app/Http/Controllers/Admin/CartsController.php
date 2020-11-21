@@ -16,10 +16,17 @@ class CartsController extends Controller
     {
         try{
             $carts=Cart::paginate(10);
-            return response()->json([
-                'status'=>200,
-                'message'=>$carts
-            ]);  
+            if(!empty($carts)){
+                return response()->json([
+                    'status'=>200,
+                    'message'=>$carts
+                ]);  
+            }else{
+                return response()->json([
+                    'status'=>404,
+                    'message'=>'there is no data'
+                ]);
+            }
         }catch(\Exception $ex){
             return response()->json([
                 'status'=>500,
@@ -68,11 +75,18 @@ class CartsController extends Controller
         try{
             DB::beginTransaction();
             $cart=Cart::find($id);
-            DB::commit();
-            return response()->json([
-                'status'=>200,
-                'message'=>$cart
-            ]);
+            if(!empty($cart)){
+                DB::commit();
+                return response()->json([
+                    'status'=>200,
+                    'message'=>$cart
+                ]);
+            }else{
+                return response()->json([
+                    'status'=>404,
+                    'message'=>'there is no data'
+                ]);
+            }
         }catch(\Exception $ex){
             DB::rollback();
             return response()->json([

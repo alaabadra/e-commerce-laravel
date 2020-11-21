@@ -7,11 +7,10 @@ use App\Models\Product;
 use App\Models\ProductAttribute;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
-
+use DB;
 class DashboardController extends Controller
 {
     public function index(){
-      $this->storeDefaultLanguages();  
       $this->putQuantityForProductBasedOnProdAttr();
     }
     public function putQuantityForProductBasedOnProdAttr(){
@@ -37,17 +36,4 @@ class DashboardController extends Controller
         
      }
     
-    public function storeDefaultLanguages(){
-        $localLang= Config::get('app.locale');
-        if($localLang=='ar'){
-            Language::insert(['language_abbr'=>$localLang,'language_direction'=>'rtl-ltl']);
-        }else{
-            Language::insert(['language_abbr'=>$localLang,'language_direction'=>'ltl-rtl']);
-
-        }
-        return response()->json([
-            'status'=>200,
-            "message"=>'added the default lang successfully'
-        ]);
-    }
 }

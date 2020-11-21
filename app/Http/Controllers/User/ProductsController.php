@@ -11,10 +11,17 @@ class ProductsController extends Controller
     {
         try{
             $products=Product::with(['category'])->paginate(10);
-            return response()->json([
-                'status'=>200,
-                'message'=>$products
-            ]);  
+            if(!empty($products)){
+                return response()->json([
+                    'status'=>200,
+                    'message'=>$products
+                ]);  
+            }else{
+                return response()->json([
+                    'status'=>404,
+                    'message'=>'there is no data'
+                ]);
+            }
 
         }catch(\Exception $ex){
             return response()->json([
@@ -27,10 +34,18 @@ class ProductsController extends Controller
     public function getProductForSubCategories($category_id){
         try{
           $productForsubCategories=Product::where(['category_id'=>$category_id])->paginate(10);
-          return response()->json([
+          if(!empty($productForsubCategories)){
+              return response()->json([
               'status'=>200,
               'message'=>$productForsubCategories
           ]);
+          }else{
+            return response()->json([
+                'status'=>404,
+                'message'=>'there is no data'
+            ]);
+          }
+          
          }catch(\Exception $ex){
               return response()->json([
                   'status'=>500,

@@ -17,11 +17,18 @@ class OrdersController extends Controller
     public function index()
     {
         try{
-            $orders=Order::with(['delivery','user'])->paginate(10);
-            return response()->json([
-                'status'=>200,
-                'message'=>$orders
-            ]);  
+            $orders=Order::with(['delivery','user','product'])->paginate(10);
+            if(!empty($orders)){
+                return response()->json([
+                    'status'=>200,
+                    'message'=>$orders
+                ]);  
+            }else{
+                return response()->json([
+                    'status'=>404,
+                    'message'=>'there is no data'
+                ]);
+            }
         }catch(\Exception $ex){
             return response()->json([
                 'status'=>500,
@@ -32,23 +39,6 @@ class OrdersController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        $deliveries=Delivery::orders()->get();
-        $users=User::orders()->get();
-        return response()->json([
-            'status'=>200,
-            'dataDeliveries'=>$deliveries,
-            'dataUsers'=>$users,
-        ]);
-        return view('carts.create');
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -56,22 +46,22 @@ class OrdersController extends Controller
      */
     public function store(Request $request)
     {
-         try{
+        // try{
             $data=$request->all();
             DB::beginTransaction();
-            Order::insert(['order_payment_method'=>$data['order_payment_method'],'order_number'=>$data['order_number'],'user_id'=>$data['user_id'],'delivery_id'=>$data['delivery_id'],'order_price'=>$data['order_price'],'order_status'=>$data['order_status'],'order_shipping_tax'=>$data['order_shipping_tax'],'order_shipping_cost'=>$data['order_shipping_cost']]);
+            Order::insert(['order_payment_method'=>$data['order_payment_method'],'order_code'=>$data['order_code'],'user_id'=>$data['user_id'],'delivery_id'=>$data['delivery_id'],'order_price'=>$data['order_price'],'order_status'=>$data['order_status'],'order_payment_method'=>$data['order_payment_method']]);
             DB::commit();
             return response()->json([
                 'status'=>200,
                 'message'=>'added new Order succefully'
             ]);
-         }catch(\Exception $ex){
-             DB::rollback();
-             return response()->json([
-                 'status'=>500,
-                 'message'=>'There is something wrong, please try again'
-             ]);
-         }
+        //  }catch(\Exception $ex){
+        //      DB::rollback();
+        //      return response()->json([
+        //          'status'=>500,
+        //          'message'=>'There is something wrong, please try again'
+        //      ]);
+        //  }
     }
 
     /**
@@ -80,16 +70,22 @@ class OrdersController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+
     public function show($id)
     {
         try{
-            DB::beginTransaction();
             $order=Order::find($id);
-            DB::commit();
-            return response()->json([
-                'status'=>200,
-                'message'=>$order
-            ]);
+            if(!empty($order)){
+                return response()->json([
+                    'status'=>200,
+                    'message'=>$order
+                ]);
+            }else{
+                return response()->json([
+                    'status'=>404,
+                    'message'=>'there is no data'
+                ]);
+            }
         }catch(\Exception $ex){
             DB::rollback();
             return response()->json([
@@ -144,7 +140,7 @@ class OrdersController extends Controller
      */
     public function delete($id)
     {
-        try{
+        //try{
             $order=Order::find($id);
             if(!$order){
                 return response()->json([
@@ -161,12 +157,11 @@ class OrdersController extends Controller
                 ]);
             }
             
-        }catch(\Exception $ex){
-            DB::rollback();
-            return response()->json([
-                'status'=>500,
-                'message'=>'There is something wrong, please try again'
-            ]);
-        }
+        // }catch(\Exception $ex){
+        //     return response()->json([
+        //         'status'=>500,
+        //         'message'=>'There is something wrong, please try again'
+        //     ]);
+        // }
     }
 }

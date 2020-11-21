@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 class ReviewController extends Controller
 {
     public function ShowReviewers($product_attr_id=null){
+      try{
         $revsCount=Review::where(['product_attr_id'=>$product_attr_id])->count();
         if($revsCount!==0){
           $revs=Review::where(['product_attr_id'=>$product_attr_id])->get();
@@ -20,5 +21,11 @@ class ReviewController extends Controller
                 'message'=>'there is no reviews on this product'
               ]);  
         }
+      }catch(\Exception $ex){
+        return response()->json([
+            'status'=>500,
+            'message'=>'There is something wrong, please try again'
+        ]);  
+    } 
         }
 }
