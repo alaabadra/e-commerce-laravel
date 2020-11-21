@@ -18,7 +18,7 @@
           </v-alert>
           <v-data-table
             :headers="headers"
-            :items="categories"
+            :items="shipings"
             :search="search"
             :items-per-page="5"
             item-key="name"
@@ -69,7 +69,7 @@
                         class="col-sm-12 mx-auto white--text font-2 text-center"
                         color="black"
                       >
-                        <i class="far list-alt mr-3"></i> Categories Management
+                        <i class="far list-alt mr-3"></i> shipings Management
                       </v-alert>
                     </v-card-title>
                     <v-card-text>
@@ -78,8 +78,43 @@
                           class="col-sm-5 mr-auto"
                           outlined
                           dense
-                          label="Category Name"
-                          v-model="editedItem.name"
+                          label="order_code"
+                          v-model="editedItem.order_code"
+                        ></v-text-field>
+                        <v-text-field
+                          class="col-sm-5 mr-auto"
+                          outlined
+                          dense
+                          label="deliver_company"
+                          v-model="editedItem.deliver_company"
+                        ></v-text-field>
+                        <v-text-field
+                          class="col-sm-5 mr-auto"
+                          outlined
+                          dense
+                          label="deliver_name"
+                          v-model="editedItem.deliver_name"
+                        ></v-text-field>
+                        <v-text-field
+                          class="col-sm-5 mr-auto"
+                          outlined
+                          dense
+                          label="	deliver_num"
+                          v-model="editedItem.deliver_num"
+                        ></v-text-field>
+                        <v-text-field
+                          class="col-sm-5 mr-auto"
+                          outlined
+                          dense
+                          label="	deliver_destination"
+                          v-model="editedItem.deliver_destination"
+                        ></v-text-field>
+                        <v-text-field
+                          class="col-sm-5 mr-auto"
+                          outlined
+                          dense
+                          label="	delivery_time"
+                          v-model="editedItem.delivery_time"
                         ></v-text-field>
                         <v-autocomplete
                           :items="status"
@@ -101,7 +136,7 @@
                                 class="mx-auto"
                                 color="blue darken-3"
                                 dark
-                                @click="save()"
+                                @click="save(editedItem.id)"
                               >
                                 <v-icon>mdi-content-save-all</v-icon>
                               </v-btn>
@@ -134,10 +169,10 @@
             </template>
             <template v-slot:item.actions="{ item }">
               <v-btn icon small @click="editItem(item)">
-                <i class="fas fa-edit"></i>
+                <v-icon>mdi-pencil-box</v-icon>
               </v-btn>
               <v-btn icon small @click="deleteItem(item)">
-                <i class="fas fa-trash-alt"></i>
+                <v-icon> mdi-delete </v-icon>
               </v-btn>
             </template>
             <template v-slot:no-data>
@@ -151,7 +186,7 @@
 </template>
 <script>
 import navigate from "../../../components/Nav";
-
+import axios from "axios";
 export default {
   name: "managebrand",
   components: {
@@ -172,21 +207,34 @@ export default {
           sortable: true,
           value: "name"
         },
-        { text: "Company", value: "company" },
-        { text: "Driver Name", value: "driver" },
-        { text: "Driver-No", value: "Driver_Number" },
-        { text: "Dest", value: "Dest" },
+        { text: "order_code", value: "order_code" },
+        { text: "deliver_company", value: "deliver_company" },
+        { text: "	deliver_name", value: "deliver_name" },
+        { text: "deliver_num", value: "	deliver_num" },
+        { text: "deliver_destination", value: "deliver_destination" },
+        { text: "delivery_status", value: "delivery_status" },
+        { text: "delivery_time", value: "delivery_time" },
         { text: "Actions", value: "actions", sortable: false }
       ],
-      categories: [],
+      shipings: [],
       editedIndex: -1,
       editedItem: {
-        name: "",
-        status: ""
+        order_code: "",
+        deliver_company: "",
+        deliver_name: "",
+        deliver_num: "",
+        deliver_destination: "",
+        delivery_status: "",
+        delivery_time: null
       },
       defaultItem: {
-        name: "",
-        status: ""
+        order_code: "",
+        deliver_company: "",
+        deliver_name: "",
+        deliver_num: "",
+        deliver_destination: "",
+        delivery_status: "",
+        delivery_time: null
       }
     };
   },
@@ -216,18 +264,28 @@ export default {
       if (status == "Not Available" || status == "منتهي") return "red";
       else if (status == "Available" || status == "متوفر") return "green";
     },
-    initialize() {},
+    initialize() {
+      axios.get("http://127.0.0.1:8000/api/admin/deliveries/view").then(res => {
+        this.shipings = res.data.message.data;
+      });
+    },
 
     editItem(item) {
-      this.editedIndex = this.categories.indexOf(item);
+      axios
+        .post(`http://127.0.0.1:8000/api/admin/deliveries/${item.id}`)
+        .then();
+      this.editedIndex = this.shipings.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
 
     deleteItem(item) {
-      const index = this.categories.indexOf(item);
+      axios
+        .post(`http://127.0.0.1:8000/api/admin/deliveries/delete/${item.id}`)
+        .then();
+      const index = this.shipings.indexOf(item);
       confirm("You Are Sure To Delete This Item?") &&
-        this.categories.splice(index, 1);
+        this.shipings.splice(index, 1);
     },
 
     close() {
@@ -238,11 +296,34 @@ export default {
       });
     },
 
-    save() {
+    save(id) {
       if (this.editedIndex > -1) {
-        Object.assign(this.categories[this.editedIndex], this.editedItem);
+        Object.assign(this.shipings[this.editedIndex], this.editedItem);
+        axios
+          .post(`http://127.0.0.1:8000/api/admin/deliveries/update/${id}`, {
+            order_code: this.editedItem.order_code,
+            deliver_company: this.editedItem.deliver_company,
+            deliver_name: this.editedItem.deliver_name,
+            deliver_num: this.editedItem.deliver_num,
+            deliver_destination: this.editedItem.deliver_destination,
+            delivery_status: this.editedItem.delivery_status,
+            delivery_time: this.editedItem.delivery_time
+          })
+          .then();
       } else {
-        this.categories.push(this.editedItem);
+        this.shipings.push(this.editedItem);
+        // var id = null;
+        axios
+          .post("http://127.0.0.1:8000/api/admin/deliveries/store", {
+            order_code: this.editedItem.order_code,
+            deliver_company: this.editedItem.deliver_company,
+            deliver_name: this.editedItem.deliver_name,
+            deliver_num: this.editedItem.deliver_num,
+            deliver_destination: this.editedItem.deliver_destination,
+            delivery_status: this.editedItem.delivery_status,
+            delivery_time: this.editedItem.delivery_time
+          })
+          .then();
       }
       this.close();
     }

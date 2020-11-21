@@ -155,7 +155,7 @@
 </template>
 <script>
 import navigate from "../../../components/Nav";
-
+import axios from "axios";
 export default {
   name: "managebrand",
   components: {
@@ -206,6 +206,9 @@ export default {
 
   created() {
     this.initialize();
+    axios.get("http://127.0.0.1:8000/api/admin/categories/view").then(res => {
+      console.log("viewwww", res.data.message.data);
+    });
   },
 
   methods: {
@@ -220,12 +223,18 @@ export default {
     initialize() {},
 
     editItem(item) {
+      axios
+        .post(`http://127.0.0.1:8000/api/admin/categories/update/${item.id}`)
+        .then();
       this.editedIndex = this.categories.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
 
     deleteItem(item) {
+      axios
+        .post(`http://127.0.0.1:8000/api/admin/categories/delete/${item.id}`)
+        .then();
       const index = this.categories.indexOf(item);
       confirm("You Are Sure To Delete This Item?") &&
         this.categories.splice(index, 1);
@@ -240,6 +249,17 @@ export default {
     },
 
     save() {
+      axios
+        .post(
+          "http://127.0.0.1:8000/api/admin/categories/store-main-category",
+          {
+            category_name: this.editItem.name,
+            category_status: this.editItem.status,
+            parent_id: null
+          }
+        )
+        .then();
+
       if (this.editedIndex > -1) {
         Object.assign(this.categories[this.editedIndex], this.editedItem);
       } else {

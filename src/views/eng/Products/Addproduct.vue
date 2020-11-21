@@ -50,27 +50,13 @@
             class="col-sm-5 mr-auto mt-2"
             outlined
             dense
-            label="Wholesale price"
-            v-model="wholesalePrice"
-          ></v-text-field>
-          <v-text-field
-            class="col-sm-5 ml-auto mt-2"
-            outlined
-            dense
-            label="Main Selling Price"
-            v-model="mainSellingPrice"
-          ></v-text-field>
-          <v-text-field
-            class="col-sm-5 mr-auto mt-2"
-            outlined
-            dense
-            label="Sub-Sale Price"
-            v-model="secSellingPrice"
+            label="price"
+            v-model="price"
           ></v-text-field>
           <v-text-field
             append-icon="mdi-weight-kilogram"
             name="input-10-2"
-            v-model="mainQuantity"
+            v-model="quantity"
             class="col-sm-5 ml-auto qty mt-2"
             outlined
             dense
@@ -80,21 +66,11 @@
           <v-text-field
             append-icon="mdi-weight-kilogram"
             name="input-10-2"
-            v-model="secQuantity"
-            class="col-sm-5 mr-auto qty mt-2"
-            outlined
-            dense
-            label="Sub-Storage Qty (Piece)"
-            @input="getWItem()"
-          ></v-text-field>
-          <v-text-field
-            append-icon="mdi-weight-kilogram"
-            name="input-10-2"
-            v-model="itemWeight"
+            v-model="weight"
             class="col-sm-5 ml-auto qty mt-2"
             outlined
             dense
-            label="Item Weight"
+            label="weight"
           ></v-text-field>
           <v-combobox
             class="col-sm-5 mr-auto mt-2"
@@ -108,26 +84,21 @@
             class="col-sm-5 ml-auto mt-2"
             outlined
             dense
-            label="Category"
-            :items="categories"
-            v-model="category"
-          ></v-combobox>
-          <v-combobox
-            class="col-sm-5 mr-auto mt-2"
-            outlined
-            dense
-            label="Store"
-            :items="stores"
-            v-model="store"
+            label="Group"
+            :items="groups"
+            v-model="group"
+            @change="fetchcategory()"
           ></v-combobox>
           <v-combobox
             class="col-sm-5 ml-auto mt-2"
             outlined
             dense
-            label="Group"
-            :items="groups"
-            v-model="group"
+            label="Category"
+            :items="categories"
+            v-model="category"
+            @change="getCategoryId()"
           ></v-combobox>
+
           <v-combobox
             class="col-sm-5 mr-auto mt-2"
             outlined
@@ -148,7 +119,7 @@
           <VueEditor
             class="col-sm-12 p-0"
             style="height:10rem; margin-bottom: 5rem;"
-            v-model="desc"
+            v-model="description"
           ></VueEditor>
           <div class="col-sm-4 mx-auto row mt-5">
             <v-tooltip top>
@@ -191,9 +162,11 @@
     </div>
   </div>
 </template>
+
 <script>
 import navigate from "../../../components/Nav";
 import { VueEditor } from "vue2-editor";
+import axios from "axios";
 export default {
   name: "Addproduct",
   components: {
@@ -207,26 +180,26 @@ export default {
       picture: null,
       name: null,
       code: Math.floor(Math.random() * 1000000000),
-      wholesalePrice: 0,
-      mainSellingPrice: 0,
-      secSellingPrice: 0,
-      mainQuantity: null,
-      secQuantity: null,
-      itemWeight: null,
-      brand: null,
+      crop: "",
+      brand: "",
+      price: 0,
+      quantity: null,
+      weight: null,
       category: null,
-      store: null,
       group: null,
       state: null,
-      desc: null,
+      description: null,
       company: null,
       brands: [],
       categories: [],
       stores: [],
       groups: [],
+      maincates: [],
+      subcates: [],
+      categoryId: null,
       companies: [],
       status: ["On Demand", "Not Available", "Available"],
-      label: "Main Storage Qty",
+      label: "Quantity",
       labels: ["Qty (Piece)", "Qty (g)", "Qty (Kg)"],
       i: 0
     };
@@ -238,10 +211,22 @@ export default {
       const reader = new FileReader();
       reader.addEventListener("load", e => {
         this.picture = e.target.result;
-        uImg.innerHTML = `<img src="${e.target.result}"  class="w-100 h-100" />`;
+        uImg.innerHTML = `<img src="${e.target.result}"  
+                 class="w-100 h-100" />`;
       });
       reader.readAsDataURL(file);
     });
+
+    axios
+      .get(
+        "http://127.0.0.1:8000/api/admin/categories/get-for-create-main-category"
+      )
+      .then(res => {
+        res.data.dataMainCategories.forEach(group => {
+          this.maincates.push(group);
+          this.groups.push(group.category_name);
+        });
+      });
   },
   methods: {
     //getting the mini property
@@ -268,6 +253,46 @@ export default {
     //a method that save products info
     saveProduct() {
       this.overlay = true;
+      axios
+        .post("http://127.0.0.1:8000/api/admin/products/store", {
+          category_id: this.categoryId,
+          product_name: this.name,
+          product_description: this.description,
+          product_price: this.price,
+          product_quantity: this.quantity,
+          product_weight: this.weight,
+          product_status: this.state,
+          product_code: this.code,
+          product_crop: this.crop,
+          product_brand: this.brand,
+          product_image: this.picture
+        })
+        .then();
+    },
+    //get category upon choosing the group name
+    // fetchcategory(mainCategoryId) {
+    //   this.maincates.forEach(group => {
+    //     if (this.group == group.category_name) {
+    //       axios
+    //         .get(
+    //           `http://127.0.0.1:8000/api/admin/categories/get-for-create-sub-category/${group.id}`
+    //         )
+    //         .then(res => {
+    //           res.data.dataSubCategories.forEach(category => {
+    //             this.categories.push(category.category_name);
+    //             this.subcates.push(category);
+    //           });
+    //         });
+    //     }
+    //   });
+    // },
+    //fetch category id upon selection
+    getCategoryId() {
+      this.subcates.forEach(category => {
+        if (this.category == category.category_name) {
+          this.categoryId = category.id;
+        }
+      });
     }
   },
   created() {},

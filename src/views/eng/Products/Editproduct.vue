@@ -36,35 +36,21 @@
             outlined
             dense
             label="Product Name"
-            v-model="product.name"
+            v-model="product.product_name"
           ></v-text-field>
           <v-text-field
             class="col-sm-5 ml-auto mt-2"
             outlined
             dense
             label="Code"
-            v-model="product.code"
+            v-model="product.product_code"
           ></v-text-field>
           <v-text-field
             class="col-sm-5 mr-auto mt-2"
             outlined
             dense
-            label="Wholesale Price"
-            v-model="product.wholesalePrice"
-          ></v-text-field>
-          <v-text-field
-            class="col-sm-5 ml-auto mt-2"
-            outlined
-            dense
-            label="Main Selling Price"
-            v-model="product.mainSellingPrice"
-          ></v-text-field>
-          <v-text-field
-            class="col-sm-5 mr-auto mt-2"
-            outlined
-            dense
-            label="Sub-Sale Price"
-            v-model="product.secSellingPrice"
+            label="Price"
+            v-model="product.product_price"
           ></v-text-field>
           <v-text-field
             append-icon="mdi-weight-kilogram"
@@ -72,23 +58,13 @@
             outlined
             dense
             :label="product.qtyLabel"
-            v-model="product.mainQuantity"
+            v-model="product.product_quantity"
             @click="changeLabel()"
           ></v-text-field>
           <v-text-field
             append-icon="mdi-weight-kilogram"
             name="input-10-2"
-            v-model="product.secQuantity"
-            class="col-sm-5 mr-auto qty mt-2"
-            outlined
-            dense
-            label="Sub-Storage Qty (Piece)"
-            @input="getWItem()"
-          ></v-text-field>
-          <v-text-field
-            append-icon="mdi-weight-kilogram"
-            name="input-10-2"
-            v-model="product.itemWeight"
+            v-model="product.product_weight"
             class="col-sm-5 ml-auto qty mt-2"
             outlined
             dense
@@ -100,7 +76,7 @@
             dense
             label="Brand"
             :items="brands"
-            v-model="product.brand"
+            v-model="product.product_brand"
           ></v-combobox>
           <v-combobox
             class="col-sm-5 ml-auto mt-2"
@@ -108,15 +84,7 @@
             dense
             label="Category"
             :items="categories"
-            v-model="product.category"
-          ></v-combobox>
-          <v-combobox
-            class="col-sm-5 mr-auto mt-2"
-            outlined
-            dense
-            label="Store"
-            :items="stores"
-            v-model="product.store"
+            v-model="product.category_id"
           ></v-combobox>
           <v-combobox
             class="col-sm-5 ml-auto mt-2"
@@ -132,7 +100,7 @@
             dense
             label="Status"
             :items="status"
-            v-model="product.status"
+            v-model="product.product_status"
           ></v-combobox>
           <v-combobox
             class="col-sm-5 ml-auto mt-2"
@@ -140,13 +108,13 @@
             dense
             label="(Corp & Importer)"
             :items="companies"
-            v-model="product.corp"
+            v-model="product.product_corp"
           ></v-combobox>
           <label class="col-sm-12 font-2 text-left">Description</label>
           <VueEditor
             class="col-sm-12 p-0"
             style="height:10rem; margin-bottom: 5rem;"
-            v-model="product.desc"
+            v-model="product.product_description"
           ></VueEditor>
           <div class="col-sm-4 mx-auto row mt-5">
             <v-tooltip top>
@@ -159,7 +127,7 @@
                   class="mx-auto"
                   color="blue darken-3"
                   dark
-                  @click="updateProduct()"
+                  @click="updateProduct(product.id)"
                 >
                   <v-icon>mdi-content-save-all</v-icon>
                 </v-btn>
@@ -192,6 +160,7 @@
 <script>
 import navigate from "../../../components/Nav";
 import { VueEditor } from "vue2-editor";
+import axios from "axios";
 export default {
   name: "Addproduct",
   components: {
@@ -252,10 +221,38 @@ export default {
       });
     },
     //a method that save products info
-    updateProduct() {}
+    updateProduct(productId) {
+      axios
+        .post(`http://127.0.0.1:8000/api/admin/products/update/${productId}`, {
+          category_id: this.product.category_id,
+          product_name: this.product.product_name,
+          product_description: this.product.product_description,
+          product_code: this.product.product_code,
+
+          product_price: this.product.product_price,
+          product_quantity: this.product.product_quantity,
+          product_weight: this.product.product_weight,
+          product_status: this.product.product_status,
+          product_crop: this.product.product_crop,
+          product_brand: this.product.product_brand,
+          product_image: this.picture
+        })
+        .then();
+    }
   },
   created() {
     //getting the data for the product by id
+    axios
+      .get(
+        `http://127.0.0.1:8000/api/admin/products/show/${this.$route.params.id}`
+      )
+      .then(res => {
+        this.product = res.data.message;
+        this.picture = res.data.message.product_image;
+        const uImg = document.querySelector(".uploadedImg");
+        uImg.innerHTML = `<img src="${res.data.message.product_image}"  
+                 class="w-100 h-100" />`;
+      });
     //retrieving data for brands
     //retrieving data for categories
     //retrieving data for stores

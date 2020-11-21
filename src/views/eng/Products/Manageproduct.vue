@@ -97,7 +97,7 @@
 </template>
 <script>
 import navigate from "../../../components/Nav";
-
+import axios from "axios";
 export default {
   name: "manageproduct",
   components: {
@@ -116,21 +116,21 @@ export default {
           text: "Name",
           align: "start",
           sortable: true,
-          value: "name"
+          value: "product_name"
         },
-        { text: "Category", value: "category" },
-        { text: "Code", value: "code" },
-        { text: "Selling Price", value: "mainSellingPrice" },
-        { text: "Status", value: "status" },
+        { text: "Category", value: "category.category_name" },
+        { text: "Code", value: "product_code" },
+        { text: "Selling Price", value: "product_price" },
+        { text: "Status", value: "product_status" },
         { text: "Actions", value: "actions", sortable: false }
       ],
       products: [],
       editedIndex: -1,
       editedItem: {
-        name: null,
-        code: null,
-        mainSellingPrice: null,
-        status: null
+        product_name: null,
+        product_code: null,
+        product_price: null,
+        product_status: null
       },
       defaultItem: {
         name: null,
@@ -168,15 +168,9 @@ export default {
       else if (status == "تحت الطلب" || status == "On Demand") return "amber";
     },
     initialize() {
-      this.products = [
-        {
-          name: "lolo",
-          code: "514515",
-          mainQuantity: "1",
-          mainSellingPrice: "priceless",
-          status: "available"
-        }
-      ];
+      axios.get("http://127.0.0.1:8000/api/admin/products/view").then(res => {
+        this.products = res.data.message.data;
+      });
     },
 
     editItem(item) {
@@ -188,7 +182,17 @@ export default {
     deleteItem(item) {
       const index = this.products.indexOf(item);
       confirm("Are You Sure To Delete This Item ?") &&
-        this.products.splice(index, 1);
+        this.remove(item.id, index);
+    },
+
+    remove(itemId, index) {
+      this.overlay = true;
+      axios
+        .post(`http://127.0.0.1:8000/api/admin/products/delete/${itemId}`)
+        .then(() => {
+          this.products.splice(index, 1);
+          this.overlay = false;
+        });
     },
 
     close() {

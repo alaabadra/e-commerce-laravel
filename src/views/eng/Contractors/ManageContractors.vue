@@ -18,7 +18,7 @@
           </v-alert>
           <v-data-table
             :headers="headers"
-            :items="categories"
+            :items="contractors"
             :search="search"
             :items-per-page="5"
             item-key="name"
@@ -81,35 +81,42 @@
                               outlined
                               dense
                               label="Contractor Name"
-                              v-model="editedItem.name"
+                              v-model="editedItem.contractor_name"
                             ></v-text-field>
                             <v-text-field
                               class="col-sm-5 mx-auto"
                               outlined
                               dense
                               label="Phone"
-                              v-model="editedItem.name"
+                              v-model="editedItem.contractor_phone"
                             ></v-text-field>
                             <v-text-field
                               class="col-sm-5 mx-auto"
                               outlined
                               dense
                               label="Contractor Address"
-                              v-model="editedItem.name"
+                              v-model="editedItem.contractor_address"
                             ></v-text-field>
                             <v-text-field
                               class="col-sm-5 mx-auto"
                               outlined
                               dense
                               label="Start Date"
-                              v-model="editedItem.name"
+                              v-model="editedItem.start_date"
                             ></v-text-field>
                             <v-text-field
                               class="col-sm-5 mx-auto"
                               outlined
                               dense
                               label="End Date"
-                              v-model="editedItem.name"
+                              v-model="editedItem.end_date"
+                            ></v-text-field>
+                            <v-text-field
+                              class="col-sm-5 mx-auto"
+                              outlined
+                              dense
+                              label="contractor_commission"
+                              v-model="editedItem.contractor_commission"
                             ></v-text-field>
                             <v-autocomplete
                               :items="status"
@@ -117,7 +124,7 @@
                               outlined
                               dense
                               label="Status"
-                              v-model="editedItem.status"
+                              v-model="editedItem.contractor_status"
                             >
                             </v-autocomplete>
                             <div class="col-sm-5 mx-auto row">
@@ -131,7 +138,7 @@
                                     class="mx-auto"
                                     color="blue darken-3"
                                     dark
-                                    @click="save()"
+                                    @click="save(editedItem.id)"
                                   >
                                     <v-icon>mdi-content-save-all</v-icon>
                                   </v-btn>
@@ -183,7 +190,7 @@
 </template>
 <script>
 import navigate from "../../../components/Nav";
-
+import axios from "axios";
 export default {
   name: "managebrand",
   components: {
@@ -202,23 +209,32 @@ export default {
           text: "Name",
           align: "start",
           sortable: true,
-          value: "name"
+          value: "contractor_name"
         },
-        { text: "Phone", value: "phone" },
-        { text: "Role", value: "buyer" },
-        { text: "Start Date", value: "Start" },
-        { text: "Due Date", value: "End" },
+        { text: "Phone", value: "contractor_phone" },
+        { text: "Role", value: "contractor_commission" },
+        { text: "Start Date", value: "start_data" },
+        { text: "Due Date", value: "end_data" },
         { text: "Actions", value: "actions", sortable: false }
       ],
-      categories: [],
+      contractors: [],
       editedIndex: -1,
       editedItem: {
-        name: "",
-        status: ""
+        contractor_name: "",
+        contractor_commission: "",
+        contractor_phone: "",
+        contractor_address: "",
+        contractor_status: "",
+        start_date: "",
+        end_date: ""
       },
       defaultItem: {
-        name: "",
-        status: ""
+        contractor_name: "",
+        contractor_phone: "",
+        contractor_address: "",
+        contractor_status: "",
+        start_date: "",
+        end_date: ""
       }
     };
   },
@@ -248,18 +264,34 @@ export default {
       if (status == "Not Available" || status == "منتهي") return "red";
       else if (status == "Available" || status == "متوفر") return "green";
     },
-    initialize() {},
+    initialize() {
+      axios
+        .get("http://127.0.0.1:8000/api/admin/contractors/view")
+        .then(res => {
+          this.contractors = res.data.message;
+        });
+    },
 
     editItem(item) {
-      this.editedIndex = this.categories.indexOf(item);
+      this.editedIndex = this.contractors.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
 
     deleteItem(item) {
-      const index = this.categories.indexOf(item);
-      confirm("You Are Sure To Delete This Item?") &&
-        this.categories.splice(index, 1);
+      const index = this.contractors.indexOf(item);
+      confirm("Are You Sure To Delete This Item ?") &&
+        this.remove(item.id, index);
+    },
+
+    remove(itemId, index) {
+      this.overlay = true;
+      axios
+        .post(`http://127.0.0.1:8000/api/admin/contractors/delete/${itemId}`)
+        .then(() => {
+          this.contractors.splice(index, 1);
+          this.overlay = false;
+        });
     },
 
     close() {
@@ -270,11 +302,33 @@ export default {
       });
     },
 
-    save() {
+    save(id) {
       if (this.editedIndex > -1) {
-        Object.assign(this.categories[this.editedIndex], this.editedItem);
+        Object.assign(this.contractors[this.editedIndex], this.editedItem);
+        axios
+          .post(`http://127.0.0.1:8000/api/admin/contractors/update/${id}`, {
+            contractor_name: this.editedItem.contractor_name,
+            contractor_address: this.editedItem.contractor_address,
+            contractor_phone: this.editedItem.contractor_phone,
+            start_date: this.editedItem.start_date,
+            end_date: this.editedItem.end_date,
+            contractor_status: this.editedItem.contractor_status,
+            contractor_commission: this.editedItem.contractor_commission
+          })
+          .then();
       } else {
-        this.categories.push(this.editedItem);
+        this.contractors.push(this.editedItem);
+        axios
+          .post("http://127.0.0.1:8000/api/admin/contractors/store", {
+            contractor_name: this.editedItem.contractor_name,
+            contractor_address: this.editedItem.contractor_address,
+            contractor_phone: this.editedItem.contractor_phone,
+            start_date: this.editedItem.start_date,
+            end_date: this.editedItem.end_date,
+            contractor_status: this.editedItem.contractor_status,
+            contractor_commission: this.editedItem.contractor_commission
+          })
+          .then();
       }
       this.close();
     }

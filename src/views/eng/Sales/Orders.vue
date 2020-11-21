@@ -16,6 +16,7 @@
           >
             <v-icon large dark>mdi-cart</v-icon> Orders Management
           </v-alert>
+
           <v-data-table
             :headers="headers"
             :items="orders"
@@ -50,7 +51,7 @@
                   "
                 ></v-text-field>
                 <v-dialog v-model="dialog">
-                  <!-- <template v-slot:activator="{ on, attrs }">
+                  <template v-slot:activator="{ on, attrs }">
                     <v-btn
                       color="primary"
                       dark
@@ -58,10 +59,11 @@
                       v-bind="attrs"
                       v-on="on"
                       icon
+                      to="add-order"
                     >
                       <v-icon large>mdi-plus-circle</v-icon>
                     </v-btn>
-                  </template> -->
+                  </template>
 
                   <v-card class="w-50 mx-auto">
                     <v-card-title>
@@ -134,10 +136,10 @@
             </template>
             <template v-slot:item.actions="{ item }">
               <v-btn icon small @click="editItem(item)">
-                <i class="fas fa-edit"></i>
+                <v-icon>mdi-pencil-box</v-icon>
               </v-btn>
               <v-btn icon small @click="deleteItem(item)">
-                <i class="fas fa-trash-alt"></i>
+                <v-icon> mdi-delete </v-icon>
               </v-btn>
             </template>
             <template v-slot:no-data>
@@ -160,7 +162,7 @@
 </template>
 <script>
 import navigate from "../../../components/Nav";
-
+import axios from "axios";
 export default {
   name: "managebrand",
   components: {
@@ -179,11 +181,13 @@ export default {
           text: "Order Code",
           align: "start",
           sortable: true,
-          value: "code"
+          value: "order_code"
         },
         { text: "Seller", value: "seller" },
         { text: "Buyer", value: "buyer" },
-        { text: "Product Id", value: "product_id" },
+        { text: "Product", value: "product.product_name" },
+        { text: "Delivery", value: "delivery.deliver_name" },
+        { text: "User Name", value: "user.name" },
         { text: "Actions", value: "actions", sortable: false }
       ],
       orders: [],
@@ -213,6 +217,9 @@ export default {
 
   created() {
     this.initialize();
+    axios.get("http://127.0.0.1:8000/api/admin/orders/view").then(res => {
+      this.orders = res.data.message.data;
+    });
   },
 
   methods: {
@@ -236,6 +243,9 @@ export default {
     },
 
     editItem(item) {
+      axios
+        .post(`http://127.0.0.1:8000/api/admin/orders/update/${item.id}`)
+        .then();
       this.editedIndex = this.orders.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
@@ -243,8 +253,18 @@ export default {
 
     deleteItem(item) {
       const index = this.orders.indexOf(item);
-      confirm("You Are Sure To Delete This Item?") &&
-        this.orders.splice(index, 1);
+      confirm("Are You Sure To Delete This Item ?") &&
+        this.remove(item.id, index);
+    },
+
+    remove(itemId, index) {
+      this.overlay = true;
+      axios
+        .post(`http://127.0.0.1:8000/api/admin/orders/delete/${itemId}`)
+        .then(() => {
+          this.orders.splice(index, 1);
+          this.overlay = false;
+        });
     },
 
     close() {

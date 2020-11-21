@@ -16,9 +16,11 @@
           >
             <v-icon dark large>mdi-account-circle</v-icon> Users Management
           </v-alert>
+          <input type="file" hidden ref="imgUpload" />
+
           <v-data-table
             :headers="headers"
-            :items="employees"
+            :items="users"
             :search="search"
             :single-expand="singleExpand"
             :expanded.sync="expanded"
@@ -30,8 +32,6 @@
           >
             <template v-slot:top>
               <v-toolbar flat color="white">
-                <!-- <v-toolbar-title>الموظفين</v-toolbar-title>
-                <v-divider class="mx-4" inset vertical></v-divider> -->
                 <v-text-field
                   v-model="search"
                   append-icon="mdi-magnify"
@@ -56,8 +56,9 @@
                       v-bind="attrs"
                       v-on="on"
                       icon
-                      ><v-icon>mdi-plus-circle</v-icon></v-btn
                     >
+                      <v-icon>mdi-plus-circle</v-icon>
+                    </v-btn>
                   </template>
 
                   <template v-slot:expanded-item="{ headers, item }">
@@ -67,7 +68,7 @@
                   </template>
                   <div class="container">
                     <div class="row">
-                      <v-card class="col-sm-7 mx-auto">
+                      <v-card class="col-sm-9 mx-auto">
                         <v-card-title>
                           <v-alert
                             class="col-sm-12 mx-auto white--text font-2 text-center"
@@ -79,6 +80,16 @@
                         </v-card-title>
                         <v-card-text>
                           <div class="row">
+                            <v-btn
+                              color="primary"
+                              class="col-sm-5 mx-auto text-center uploadedImg p-0 mb-3"
+                              style="height:13rem;"
+                              dark
+                              @click="openFile()"
+                            >
+                              <v-icon x-large>mdi-file-image</v-icon>
+                            </v-btn>
+                            <div class="col-sm-5 mx-auto"></div>
                             <v-text-field
                               class="col-sm-5 mx-auto"
                               outlined
@@ -137,26 +148,26 @@
                               label="Phone"
                               v-model="editedItem.phone"
                             ></v-text-field>
-                            <v-autocomplete
-                              class="col-sm-5 mx-auto"
-                              outlined
-                              dense
-                              label="Group"
-                              :items="groups"
-                              v-model="editedItem.group"
-                            ></v-autocomplete>
                             <v-text-field
                               class="col-sm-5 mx-auto"
                               outlined
                               dense
-                              label="National Id"
-                              v-model="editedItem.nationalId"
+                              label="Number Card"
+                              v-model="editedItem.numCard"
                             ></v-text-field>
+                            <v-combobox
+                              class="col-sm-5 mx-auto"
+                              outlined
+                              dense
+                              label="User Status"
+                              :items="status"
+                              v-model="state"
+                            ></v-combobox>
                             <div class="col-sm-5 mx-auto row">
                               <v-btn
                                 color="blue lighten-1"
                                 class="col-sm-5 mx-auto  white--text"
-                                @click="save()"
+                                @click="save(editedItem.id)"
                                 >Save <i class="fas fa-file mr-3"></i
                               ></v-btn>
                               <v-btn
@@ -176,10 +187,10 @@
             </template>
             <template v-slot:item.actions="{ item }">
               <v-btn icon small @click="editItem(item)">
-                <i class="fas fa-edit"></i>
+                <v-icon small>mdi-pencil-box</v-icon>
               </v-btn>
               <v-btn icon small @click="deleteItem(item)">
-                <i class="fas fa-trash-alt"></i>
+                <v-icon small>mdi-delete</v-icon>
               </v-btn>
             </template>
             <template v-slot:no-data>
@@ -194,7 +205,9 @@
     </div>
   </div>
 </template>
+
 <script>
+import axios from "axios";
 import navigate from "../../../components/Nav";
 export default {
   name: "manageemp",
@@ -203,6 +216,9 @@ export default {
   },
   data() {
     return {
+      picture: null,
+      status: ["DeActivated", "Active"],
+      state: null,
       mini: true,
       password: null,
       confirmPass: null,
@@ -227,31 +243,54 @@ export default {
           sortable: true,
           value: "name"
         },
-        { text: "Email", value: "email" },
-        { text: "Phone", value: "phone" },
-        { text: "Address", value: "address" },
-        { text: "Group", value: "group" },
-        { text: "Actions", value: "actions", sortable: false }
+        {
+          text: "Email",
+          value: "email"
+        },
+        {
+          text: "Phone",
+          value: "phone"
+        },
+        {
+          text: "Address",
+          value: "address"
+        },
+        {
+          text: "Actions",
+          value: "actions",
+          sortable: false
+        }
       ],
-      employees: [],
+      users: [],
       editedIndex: -1,
       editedItem: {
         name: "",
         email: "",
         phone: "",
         address: "",
-        group: ""
+        numCard: null
       },
       defaultItem: {
         name: "",
         email: "",
         phone: "",
-        address: "",
-        group: ""
+        address: ""
       }
     };
   },
-
+  mounted() {
+    this.$refs.imgUpload.addEventListener("change", e => {
+      const uImg = document.querySelector(".uploadedImg");
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.addEventListener("load", e => {
+        this.picture = e.target.result;
+        uImg.innerHTML = `<img src="${e.target.result}"  
+                 class="w-100 h-100" />`;
+      });
+      reader.readAsDataURL(file);
+    });
+  },
   computed: {
     formTitle() {
       return this.editedIndex === -1 ? "New Item" : "Edit Item";
@@ -269,23 +308,32 @@ export default {
   },
 
   methods: {
+    openFile() {
+      this.$refs.imgUpload.click();
+    },
     //getting the mini property
     emitValue(value) {
       this.mini = value;
     },
     initialize() {
-      //this.employees.push();
+      //this.users.push();
+      axios.get("http://127.0.0.1:8000/api/admin/users/view").then(res => {
+        this.users = res.data.message.data;
+      });
     },
     editItem(item) {
-      this.editedIndex = this.employees.indexOf(item);
+      this.editedIndex = this.users.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
 
     deleteItem(item) {
-      const index = this.employees.indexOf(item);
+      axios
+        .post(`http://127.0.0.1:8000/api/admin/users/delete/${item.id}`)
+        .then();
+      const index = this.users.indexOf(item);
       confirm("Are You Sure To Delete This Item ?") &&
-        this.employees.splice(index, 1);
+        this.users.splice(index, 1);
     },
 
     close() {
@@ -296,11 +344,35 @@ export default {
       });
     },
 
-    save() {
+    save(id) {
       if (this.editedIndex > -1) {
-        Object.assign(this.employees[this.editedIndex], this.editedItem);
+        Object.assign(this.users[this.editedIndex], this.editedItem);
+        axios
+          .post(`http://127.0.0.1:8000/api/admin/users/update/${id}`, {
+            name: this.editedItem.name,
+            email: this.editedItem.email,
+            image: this.picture,
+            password: this.password,
+            address: this.editedItem.address,
+            phone: this.editedItem.phone,
+            num_card: this.editedItem.numCard,
+            user_status: this.state
+          })
+          .then();
       } else {
-        this.employees.push(this.editedItem);
+        this.users.push(this.editedItem);
+        axios
+          .post("http://127.0.0.1:8000/api/admin/users/store", {
+            name: this.editedItem.name,
+            email: this.editedItem.email,
+            image: this.picture,
+            password: this.password,
+            address: this.editedItem.address,
+            phone: this.editedItem.phone,
+            num_card: this.editedItem.numCard,
+            user_status: this.state
+          })
+          .then();
       }
       this.close();
     }

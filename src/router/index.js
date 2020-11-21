@@ -70,6 +70,7 @@ const routes = [
         "../views/eng/Products/Editproduct.vue"
       )
   },
+
   {
     path: "/Manage-Categories",
     name: "/Manage-Categories",
@@ -121,6 +122,19 @@ const routes = [
   {
     path: "/Order/:code",
     name: "/Order",
+    // route level code-splitting
+
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () =>
+      import(
+        /* webpackChunkName: "about" */
+        "../views/eng/Sales/Order.vue"
+      )
+  },
+  {
+    path: "/Add-Order",
+    name: "/Add-Order",
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.

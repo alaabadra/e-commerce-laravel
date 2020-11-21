@@ -37,7 +37,17 @@
             label="WebSite Or Product Link"
             class="col-sm-12 ml-auto"
             prepend-inner-icon="mdi-link"
+            v-model="link"
           ></v-text-field>
+          <v-autocomplete
+            :items="status"
+            class="col-sm-5 mx-auto"
+            outlined
+            dense
+            label="Status"
+            v-model="status"
+          >
+          </v-autocomplete>
           <v-btn
             color="primary"
             class="col-sm-12 mr-auto text-center uploadedImg p-0"
@@ -55,7 +65,7 @@
           <VueEditor
             class="col-sm-12 p-0"
             style="height:10rem; margin-bottom: 5rem;"
-            v-model="desc"
+            v-model="description"
           ></VueEditor>
           <div class="col-sm-4 mx-auto row mt-5">
             <v-tooltip top>
@@ -68,7 +78,7 @@
                   class="mx-auto"
                   color="blue darken-3"
                   dark
-                  @click="saveProduct()"
+                  @click="save()"
                 >
                   <v-icon>mdi-content-save-all</v-icon>
                 </v-btn>
@@ -101,6 +111,7 @@
 <script>
 import navigate from "../../../components/Nav";
 import { VueEditor } from "vue2-editor";
+import axios from "axios";
 export default {
   name: "Addproduct",
   components: {
@@ -115,7 +126,8 @@ export default {
       name: null,
       code: Math.floor(Math.random() * 1000000000),
       brand: null,
-      desc: null,
+      description: null,
+      link: "",
       company: null,
       brands: [],
       categories: [],
@@ -170,8 +182,17 @@ export default {
       this.$refs.imgUpload.click();
     },
     //a method that save products info
-    saveProduct() {
+    save() {
       this.overlay = true;
+      axios
+        .post("http://127.0.0.1:8000/api/admin/addvertisments/store", {
+          addvertisment_name: this.name,
+          addvertisment_description: this.description,
+          addvertisment_status: this.status,
+          addvertisment_link: this.link,
+          addvertisment_image: this.picture
+        })
+        .then();
     }
   },
   created() {},

@@ -14,28 +14,29 @@
           >
             <i class="fas fa-donate mr-3"></i> Manage Sales
           </v-alert>
-
           <v-combobox
             class="col-sm-5 mr-auto mt-2"
             outlined
             dense
             label="Client Name"
             :items="clients"
-            v-model="clientName"
+            v-model="clientEmail"
+            @change="fetchUserId()"
           ></v-combobox>
           <v-text-field
             class="col-sm-5 ml-auto mt-2"
+            v-model="deliveryName"
+            label="delivery Name"
             outlined
             dense
-            label="Phone"
-            v-model="clientPhone"
           ></v-text-field>
+
           <v-text-field
-            class="col-sm-5 mr-auto mt-2"
+            class="col-sm-5 ml-auto mt-2"
+            v-model="order_code"
+            label="Order Code"
             outlined
             dense
-            label="Address"
-            v-model="clientAddress"
           ></v-text-field>
           <v-text-field
             class="col-sm-5 ml-auto mt-2"
@@ -50,8 +51,8 @@
             outlined
             dense
             label="Payment Method"
-            :items="states"
-            v-model="status"
+            :items="statesPaymentMethod"
+            v-model="statusPaymentMethod"
           ></v-autocomplete>
           <v-data-table
             :headers="headers"
@@ -77,8 +78,9 @@
                       v-bind="attrs"
                       v-on="on"
                       icon
-                      ><i class="far fa-plus-square font-3 black--text"></i
-                    ></v-btn>
+                    >
+                      <v-icon dark large>mdi-plus-box</v-icon>
+                    </v-btn>
                   </template>
                   <v-card>
                     <v-card-title>
@@ -95,25 +97,29 @@
                         <div class="row">
                           <v-combobox
                             :items="products"
-                            v-model="editedItem.name"
+                            v-model="editedItem.product_name"
                             label="Product Name"
                             outlined
                             dense
                             class="col-sm-5 mr-auto"
                           ></v-combobox>
-                          <v-text-field
-                            v-model="editedItem.category"
-                            label="Category"
+
+                          <v-combobox
+                            class="col-sm-5 ml-auto mt-2"
                             outlined
                             dense
-                            class="col-sm-5 ml-auto"
-                          ></v-text-field>
+                            label="Category"
+                            :items="categories"
+                            v-model="category"
+                          ></v-combobox>
+                          {{ editedItem.product_code }}
                           <v-text-field
-                            v-model="editedItem.code"
                             label="Code"
                             outlined
                             dense
                             class="col-sm-5 mr-auto"
+                            v-model="editedItem.product_code"
+                            @change="fetchDataProduct(editedItem.product_code)"
                           ></v-text-field>
                           <v-text-field
                             v-model="editedItem.quantity"
@@ -184,10 +190,10 @@
             </template>
             <template v-slot:item.actions="{ item }">
               <v-btn icon small @click="editItem(item)">
-                <i class="fas fa-edit"></i>
+                <v-icon small>mdi-pencil-box</v-icon>
               </v-btn>
               <v-btn icon small @click="deleteItem(item)">
-                <i class="fas fa-trash-alt"></i>
+                <v-icon small>mdi-delete</v-icon>
               </v-btn>
             </template>
             <template v-slot:no-data>
@@ -280,6 +286,7 @@
 </template>
 <script>
 import navigate from "../../../components/Nav";
+import axios from "axios";
 export default {
   name: "Addorder",
   components: {
@@ -287,15 +294,19 @@ export default {
   },
   data() {
     return {
+      user_id: null,
+      categories: [],
+      category: null,
       hidden: true,
       overlay: false,
       paid: 0,
       deserved: 0,
       orderId: null,
-      status: null,
+      statusPaymentMethod: null,
       date: new Date().toISOString().substr(0, 10),
       code: null,
-      clientName: null,
+      clientEmail: null,
+      order_code: "",
       clientPhone: null,
       clientAddress: null,
       clientId: null,
@@ -310,8 +321,12 @@ export default {
       labels: ["Main Qty", "Sub Qty"],
       dialog: false,
       delDialog: false,
-      states: ["Postpaid", "Cash"],
+      deliveryName: "",
+      statesPaymentMethod: ["Postpaid", "Cash"],
       clients: [],
+
+      users: [],
+      deliveries: [],
       products: [],
       headers: [
         {
@@ -332,8 +347,8 @@ export default {
       orderItems: [],
       editedIndex: -1,
       editedItem: {
-        name: null,
-        code: null,
+        product_name: null,
+        product_code: null,
         category: null,
         quantity: 0,
         store: 0,
@@ -372,6 +387,8 @@ export default {
   },
 
   created() {
+    this.fetchAllUsers();
+    this.fetchAllDeliveries();
     this.initialize();
     //checking for the unique code
     this.generateKeys();
@@ -402,19 +419,75 @@ export default {
     //getting the rest of the product automatically by name
 
     // getting the rest of the product automatically by code
+
+    //getting data sub categories
+    axios
+      .get("http://127.0.0.1:8000/api/admin/categories/sub-categories")
+      .then(res => {
+        res.data.dataSubCategories.forEach(cat => {
+          this.categories.push(cat.category_name);
+        });
+      });
   },
 
   methods: {
+    fetchDataProduct(product_code) {
+      axios
+        .get(
+          `http://127.0.0.1:8000/api/admin/products/show-product-data-by-code/${product_code}`
+        )
+        .then(res => {
+          (this.category = res.data.message.category.category_name),
+            (this.editItem.product_name = res.data.message.product_name),
+            (this.editItem.quantity = res.data.message.product_quantity),
+            (this.editItem.price = res.data.message.product_price);
+        });
+    },
     getColor(status) {
       if (status == "منتهية" || status == "Not Available") return "red";
       else if (status == "متواجدة" || status == "Available") return "green";
       else if (status == "تحت الطلب" || status == "On Demand") return "amber";
     },
     initialize() {
-      this.orderItems = [];
+      if (this.$route.params.id) {
+        this.orderItems = [];
+      }
       //getting clients data
     },
-
+    fetchAllSubCategories() {
+      axios
+        .get("http://127.0.0.1:8000/api/admin/categories/sub-subcategories")
+        .then(res => {
+          res.data.message.forEach(client => {
+            this.clients.push(client.name);
+          });
+        });
+    },
+    fetchAllUsers() {
+      axios.get("http://127.0.0.1:8000/api/admin/users/all-users").then(res => {
+        this.users = res.data.message;
+        res.data.message.forEach(client => {
+          this.clients.push(client.email);
+        });
+      });
+    },
+    //fetch users id
+    fetchUserId() {
+      this.users.forEach(user => {
+        if (user.email == this.clientEmail) {
+          this.user_id = user.id;
+        }
+      });
+    },
+    fetchAllDeliveries() {
+      axios
+        .get("http://127.0.0.1:8000/api/admin/deliveries/all-deliveries")
+        .then(res => {
+          res.data.message.forEach(delivery => {
+            this.deliveries.push(delivery.deliver_name);
+          });
+        });
+    },
     editItem(item) {
       this.editedIndex = this.orderItems.indexOf(item);
       this.editedItem = Object.assign({}, item);
@@ -456,7 +529,21 @@ export default {
     //method to save rder data and items
     saveOrder() {
       //   this.overlay = true;
+      this.overlay = true;
+      axios
+        .post("http://127.0.0.1:8000/api/admin/orders/store", {
+          delivery_id: this.deliveryName,
+          product_id: this.product_id,
+          order_seller: this.order_seller,
+          user_id: this.user_id,
+          order_price: this.order_price,
+          order_code: this.order_code,
+          order_payment_method: this.statusPaymentMethod,
+          order_status: this.order_status
+        })
+        .then();
     },
+
     //method to change the label of an item
     changeLabel() {
       if (this.i < 2) {
