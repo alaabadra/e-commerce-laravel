@@ -1,17 +1,9 @@
 <?php
 use App\Models\Language;
-function uploadImage($folder,$image){
-  // dd($image);
-    $image->store('/',$folder);
-    $filename=$image->hasName();
-    $path='images/'.$folder.'/'.$filename;
-    return $path;
-  }
+
 
 function forDefaultLang(){
-  // dd(00);
   $localLang= Config::get('app.locale');
-  // dd($localLang);
     $langDefaultInTableLangCount=Language::where(['language_abbr'=>$localLang])->count();
     if($langDefaultInTableLangCount!==0){//the default lang is exist in table language
         $langDefaultInTableLang=Language::where(['language_abbr'=>$localLang])->first();//get default language from table languages
